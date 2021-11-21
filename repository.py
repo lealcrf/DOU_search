@@ -2,6 +2,10 @@ import mysql.connector
 import json
 from mysql.connector.cursor import MySQLCursor
 from mysql.connector.connection import MySQLConnection
+import pandas as pd
+
+from model import Publicacao
+
 
 class PublicacoesDB:
     def __init__(self):
@@ -14,14 +18,14 @@ class PublicacoesDB:
                 password=cred["PASSWORD"],
                 database=cred["DATABASE"],
             )
-        
+
         self._cursor = self._conn.cursor()
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
+        self._close()
 
     @property
     def connection(self) -> MySQLConnection:
@@ -34,7 +38,7 @@ class PublicacoesDB:
     def commit(self):
         self.connection.commit()
 
-    def close(self, commit=False):
+    def _close(self, commit=False):
         if commit:
             self.commit()
         self.connection.close()
@@ -42,12 +46,10 @@ class PublicacoesDB:
     def execute(self, sql, params=None):
         self.cursor.execute(sql, params or ())
 
-    def fetchall(self):
-        return self.cursor.fetchall()
+    def _fetchall(self):        
+        resp = [Publicacao(*pub) for pub in self.cursor.fetchall()]
+        return pd.DataFrame(resp)
 
-    def fetchone(self):
-        return self.cursor.fetchone()
-
-    def query(self, sql, params=None):
+    def query(self, sql, params=None): 
         self.cursor.execute(sql, params or ())
-        return self.fetchall()
+        return self._fetchall()

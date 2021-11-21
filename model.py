@@ -18,7 +18,3 @@ class Publicacao:
     ementa: str
     conteudo: str
     assinatura: str
-
-    
-    
-

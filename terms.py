@@ -1,13 +1,13 @@
-ASSINATURAS_PRESIDENTE_E_DIRETORES = [
-    #* Comentado = Não aparece nenhuma vez no meu banco de dados
+ASSINATURA_DIRETORES_E_PRESIDENTE = [
+    #* Azul = Não aparece nenhuma vez no meu banco de dados
     "ROBERTO DE OLIVEIRA CAMPOS NETO",  # Presidente
-    # "Maurício Costa de Moura",  # Diretor de Relacionamento, Cidadania e Supervisão de Conduta - Direc 
-    # "Paulo Souza",  # Diretor de Fiscalização - Difis
-    # "Fabio Kanczuk",  # Diretor de Política Econômica - Dipec
+    "Maurício Costa de Moura",  #* Diretor de Relacionamento, Cidadania e Supervisão de Conduta - Direc 
+    # "Paulo Souza",   #* Diretor de Fiscalização - Difis 
+    # "Fabio Kanczuk",  #* Diretor de Política Econômica - Dipec
     "Bruno Serra Fernandes",  # Diretor de Política Monetária - Dipom
-    # "Fernanda Guardado",  # Diretora de Assuntos Internacionais e de Gestão de Riscos Corporativos - Direx
+    "Fernanda Guardado",  #* Diretora de Assuntos Internacionais e de Gestão de Riscos Corporativos - Direx
     "João Manoel Pinho de Mello",  # Diretor de Organização do Sistema Financeiro e de Resolução - Diorf
-    # "Otávio Ribeiro Damaso",  # Diretor de Regulação - Dinor
+    "Otávio Ribeiro Damaso",  #* Diretor de Regulação - Dinor
     "Carolina de Assis Barros",  # Diretora de Administração - Dirad
 ]
 

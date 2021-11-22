@@ -5,35 +5,53 @@ import re
 import operator
 from functools import reduce
 
-from terms import ASSINATURAS_PRESIDENTE_E_DIRETORES
+from terms import ASSINATURA_DIRETORES_E_PRESIDENTE, TERMOS_DE_POSSE
 
 
-def keyword_search(
-    df: pd.DataFrame, columns: List[pd.Series], keywords: List[str], where=None
-) -> pd.DataFrame:
+class Search:
+    def __init__(self, df: pd.DataFrame, date: datetime.date = None):
+        self.df = df[df.data == str(date)] if date is not None else df
 
-    base = r"^{}"
-    expr = "(?=.*{})"
-    search_regex = base.format("|".join(expr.format(w) for w in keywords))
+    def keyword_search(
+        self, columns: List[pd.Series], keywords: List[str], where=None
+    ) -> pd.DataFrame:
 
-    frames = [
-        column.notnull()
-        & column.str.contains(search_regex, flags=re.IGNORECASE, regex=True)
-        for column in columns
-    ]
+        regex = f'({"|".join(keywords)})'
+        frames = [
+            self.df[
+                column.str.contains(regex, flags=re.IGNORECASE, regex=True, na=False)
+            ]
+            for column in columns
+        ]
 
-    df = df[reduce(operator.iand, frames)]  # equivalente a => df[condition1 & c2 & c3]
+        df = pd.concat(frames)
 
-    if where is None:
-        return df
+        if where is None:
+            return df
 
-    return df[where]
+        return df[where]
 
+    def diretores_e_presidente(self) -> pd.DataFrame:
+        return self.keyword_search(
+            columns=[self.df.assinatura.str.normalize("NFD")],
+            keywords=ASSINATURA_DIRETORES_E_PRESIDENTE,
+        )
 
-def diretores_e_presidente(df: pd.DataFrame) -> pd.DataFrame:
-    return keyword_search(
-        df,
-        [df.assinatura],
-        ASSINATURAS_PRESIDENTE_E_DIRETORES,
-        where=(df.data == datetime.date(2021, 11, 19)),
-    )
+    def atos_do_CMN(self) -> pd.DataFrame:
+        return self.keyword_search(
+            columns=[self.df.titulo],
+            keywords=["CMN"],
+        )
+
+    def banco_central_secao_1(self) -> pd.DataFrame:
+        return self.keyword_search(
+            columns=[self.df.escopo],
+            keywords=["Banco Central"],
+            where=(self.df.secao.str.contains("DO1")),
+        )
+
+    def posse_de_cargo(self) -> pd.DataFrame:
+        return self.keyword_search(
+            columns=[self.df.conteudo, self.df.titulo],
+            keywords=TERMOS_DE_POSSE,
+        )

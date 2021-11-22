@@ -2,15 +2,23 @@ ASSINATURA_DIRETORES_E_PRESIDENTE = [
     #* Azul = Não aparece nenhuma vez no meu banco de dados
     "ROBERTO DE OLIVEIRA CAMPOS NETO",  # Presidente
     "Maurício Costa de Moura",  #* Diretor de Relacionamento, Cidadania e Supervisão de Conduta - Direc 
+    #! Esse Paulo Souza tem um nome comum de mais, tive que comentar ele
     # "Paulo Souza",   #* Diretor de Fiscalização - Difis 
-    # "Fabio Kanczuk",  #* Diretor de Política Econômica - Dipec
+    "Fabio Kanczuk",  #* Diretor de Política Econômica - Dipec
     "Bruno Serra Fernandes",  # Diretor de Política Monetária - Dipom
     "Fernanda Guardado",  #* Diretora de Assuntos Internacionais e de Gestão de Riscos Corporativos - Direx
     "João Manoel Pinho de Mello",  # Diretor de Organização do Sistema Financeiro e de Resolução - Diorf
     "Otávio Ribeiro Damaso",  #* Diretor de Regulação - Dinor
     "Carolina de Assis Barros",  # Diretora de Administração - Dirad
 ]
-
+CONTEUDO = [
+    # Assunto 6:
+    "cargo de Presidente do Banco Central do Brasil",
+    # Assunto 7:
+    "cargo de Diretor do Banco Central do Brasil",
+    "cargo de Diretora do Banco Central do Brasil",
+    
+]
 
 TERMOS_GERAIS = [
     # |-----------------------------------------| Geral |-----------------------------------------|
@@ -27,11 +35,6 @@ TERMOS_GERAIS = [
     "Imposto sobre Operações Financeiras",
     # Assunto 4:
     "Administração Pública federal direta, autárquica e fundacional",
-    # Assunto 6:
-    "cargo de Presidente do Banco Central do Brasil",
-    # Assunto 7:
-    "cargo de Diretor do Banco Central do Brasil",
-    "cargo de Diretora do Banco Central do Brasil",
     # Assunto 8:
     "Comissão Técnica da Moeda e do Crédito",
     # Assunto 9: # WHY Isso aqui não ta mt grande não?

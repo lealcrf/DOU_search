@@ -12,11 +12,17 @@ class PublicacoesDB:
         with open("credentials.json", "r") as f:
             cred = json.loads(f.read())
 
+            # self._conn = mysql.connector.connect(
+            #     host=cred["ENDPOINT"],
+            #     user=cred["USER"],
+            #     password=cred["PASSWORD"],
+            #     database=cred["DATABASE"],
+            # )
             self._conn = mysql.connector.connect(
-                host=cred["ENDPOINT"],
-                user=cred["USER"],
-                password=cred["PASSWORD"],
-                database=cred["DATABASE"],
+                host="127.0.0.1",
+                user="root",
+                password="oasuet10",
+                database="dou_db_local",
             )
 
         self._cursor = self._conn.cursor()
@@ -46,10 +52,10 @@ class PublicacoesDB:
     def execute(self, sql, params=None):
         self.cursor.execute(sql, params or ())
 
-    def _fetchall(self):        
+    def _fetchall(self):
         resp = [Publicacao(*pub) for pub in self.cursor.fetchall()]
         return pd.DataFrame(resp)
 
-    def query(self, sql, params=None): 
+    def query(self, sql, params=None):
         self.cursor.execute(sql, params or ())
         return self._fetchall()

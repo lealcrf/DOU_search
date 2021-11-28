@@ -1,17 +1,16 @@
-ASSINATURA_DIRETORES_E_PRESIDENTE = [
-    # * Azul = Não aparece nenhuma vez no meu banco de dados
+ASSINATURAS = [
+    # * = Não aparece nenhuma vez no meu banco de dados
     "ROBERTO DE OLIVEIRA CAMPOS NETO",  # Presidente
     "Maurício Costa de Moura",  # * Diretor de Relacionamento, Cidadania e Supervisão de Conduta - Direc
-    #! Esse Paulo Souza tem um nome comum de mais, tive que comentar ele
-    "Paulo sérgio Neves Souza",   #* Diretor de Fiscalização - Difis
+    "Paulo sérgio Neves Souza",  # * Diretor de Fiscalização - Difis
     "Fabio Kanczuk",  # * Diretor de Política Econômica - Dipec
     "Bruno Serra Fernandes",  # Diretor de Política Monetária - Dipom
     "Fernanda Guardado",  # * Diretora de Assuntos Internacionais e de Gestão de Riscos Corporativos - Direx
     "João Manoel Pinho de Mello",  # Diretor de Organização do Sistema Financeiro e de Resolução - Diorf
     "Otávio Ribeiro Damaso",  # * Diretor de Regulação - Dinor
     "Carolina de Assis Barros",  # Diretora de Administração - Dirad
-    # 'PAULO GUEDES'
 ]
+
 TERMOS_DE_POSSE = [
     # Assunto 6:
     "cargo de Presidente do Banco Central do Brasil",
@@ -31,13 +30,13 @@ TERMOS_DE_POSSE = [
     # Assunto 16:
     "cargo de Diretor da Comissão de Valores Mobiliários",
     # Assunto 17:
-    "cargo de Superintendente da Superintendência de Seguros Privados – SUSEP",
+    "cargo de Superintendente da Superintendência de Seguros Privados",
     # Assunto 18:
-    "cargo de Diretor da Superintendência de Seguros Privados - SUSEP",
+    "cargo de Diretor da Superintendência de Seguros Privados",
     # Assunto 19:
-    "cargo de Diretor-Superintendente da Superintendência Nacional de Previdência Complementar - PREVIC",
+    "cargo de Diretor-Superintendente da Superintendência Nacional de Previdência Complementar",
     # Assunto 20:
-    "cargo de Diretor de Licenciamento da Superintendência Nacional de Previdência Complementar - PREVIC",
+    "cargo de Diretor de Licenciamento da Superintendência Nacional de Previdência Complementar",
     # Assunto 21:
     "cargo de Secretário Especial Adjunto da Secretaria Especial de Previdência e Trabalho do Ministério da Economia",
     # Assunto 22:
@@ -48,6 +47,7 @@ TERMOS_DE_POSSE = [
     #
     "cargo de Ministro de Estado do Trabalho e Previdência",
 ]
+
 
 TERMOS_GERAIS = [
     # |-----------------------------------------| Geral |-----------------------------------------|

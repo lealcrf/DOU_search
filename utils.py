@@ -11,15 +11,29 @@ def tirar_acentuacao(s):
 
 
 class ColumnSearch:
-    def __init__(self, column: pd.Series, keywords: List[str]):
+    def __init__(self, columns: List[pd.Series], keywords: List[str]):
         # Se for assinatura, remove a acentuação de tudo para fazer uma melhor comparação (a acentuação das assinaturas são consistentes)
-        if column.name == "assinatura":
-            self.column = (
-                column.str.normalize("NFKD")
-                .str.encode("ascii", errors="ignore")
-                .str.decode("utf-8")
-            )
-            self.keywords = [tirar_acentuacao(assinatura) for assinatura in keywords]
+
+        clean_columns = []
+
+        tem_assinatura = False
+
+        for column in columns:
+            if column.name == "assinatura":
+                tem_assinatura = True
+
+                clean_columns.append(
+                    column.str.normalize("NFKD")
+                    .str.encode("ascii", errors="ignore")
+                    .str.decode("utf-8")
+                )
+
+            else:
+                clean_columns.append(column)
+
+        self.columns = clean_columns
+
+        if tem_assinatura:
+            self.keywords = [tirar_acentuacao(i) for i in keywords]
         else:
-            self.column = column
             self.keywords = keywords

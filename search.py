@@ -1,49 +1,39 @@
 import datetime
-from typing import List
+from typing import Dict, List
 import pandas as pd
 import re
 
 
-from terms import ASSINATURAS, COAF, TERMOS_DE_POSSE
-from utils import tirar_acentuacao
+from terms import ASSINATURAS, TERMOS_DE_POSSE
+from utils import ColumnSearch, tirar_acentuacao
 
 
 class Search:
-    def __init__(self, df: pd.DataFrame, date: datetime.date = None):
-        self.df = df[df.data == date] if date is not None else df
+    def __init__(self, df: pd.DataFrame, date: datetime.date = None, is_csv=False):
+        if is_csv:
+            self.df = df[df.data == str(date)] if date is not None else df
+        else:
+            self.df = df[df.data == date] if date is not None else df
 
-    def keyword_search(
-        self, columns: List[pd.Series], keywords: List[str], where=None
-    ) -> pd.DataFrame:
+    def keyword_search(self, searches: List[ColumnSearch], where=None) -> pd.DataFrame:
+        """Retorna as publicacões que tiverem todos os termos explicitados em [searches]"""
 
-        regex = f'({"|".join(keywords)})'
-        frames = [
-            self.df[
-                column.str.contains(regex, flags=re.IGNORECASE, regex=True, na=False)
+        result_df = self.df
+
+        # Faz cada pesquisa individualmente, sendo o resultado da última o input da próxima
+        for search in searches:
+            key_words_regex = f'({"|".join(search.keywords)})'
+
+            result_df = result_df[
+                search.column.str.contains(
+                    key_words_regex, flags=re.IGNORECASE, regex=True, na=False
+                )
             ]
-            for column in columns
-        ]
-
-        df = pd.concat(frames).drop_duplicates()
 
         if where is None:
-            return df
+            return result_df
 
-        return df[where]
-
-    def assinaturas_dos_diretores_e_presidente(self):
-        """Qualquer coisa assinada por um diretor/presidente do BC entra na súmula
-
-        Ao comparar as assinaturas, ele vai remover as acentuações, uma vez que o uso de acentuação é bem inconsistente
-        """
-        return self.keyword_search(
-            columns=[
-                self.df.assinatura.str.normalize("NFKD")
-                .str.encode("ascii", errors="ignore")
-                .str.decode("utf-8")
-            ],
-            keywords=[tirar_acentuacao(assinatura) for assinatura in ASSINATURAS],
-        ).assign(motivo = "Assinatura de um diretor ou pelo presidente do BC")
+        return result_df[where]
 
     def atos_e_resolucoes_do_CMN(self):
         """Qualquer ato do CMN entra na súmula"""
@@ -52,28 +42,43 @@ class Search:
             keywords=[r"\sCMN\s"],
         ).assign(motivo="Ato do CMN")
 
-    def banco_central_secao_1(self):
-        """Todos as publicacões que não sejam Instruções normativas do Banco Central no DO1 entram na súmula"""
-
-        return self.keyword_search(
-            columns=[self.df.escopo],
-            keywords=["Banco Central"],
-            where=(self.df.tipo_normativo != "Instrução Normativa")
-            & (self.df.secao.str.contains("DO1")),
-        ).assign(motivo="Publicação do BC no DO1 que não é intrução normativa")
-
     def posse_e_exoneracao_de_cargo(self):
         """Toda posse/exoneração de um cargo importante vai pra súmula"""
 
         return self.keyword_search(
             columns=[self.df.conteudo, self.df.titulo],
             keywords=TERMOS_DE_POSSE,
-        ).assign(motivo = "posse e exoneração de cargo")
+        ).assign(motivo="posse e exoneração de cargo")
+
+    # def afastamentos(self):
+    #     return self.keyword_search(
+    #         columns=[self.df.conteudo],
+    #         keywords=TERMOS_DE_AFASTAMENTO,
+    #     ).assign(motivo="Afastamento")
+
+    def coaf(self):
+        ausencia_do_presidente = self.keyword_search(
+            columns=[self.df.conteudo],
+            keywords=[
+                "Despacho do Presidente do Banco Central do Brasil.+Presidente do COAF"
+            ],  # Sempre que o presidente do COAF se ausenta, o Presidente do Banco Central do Brasil precisa fazer um despacho
+        ).assign(motivo="Presidente do COAF se ausentou (férias, substituído, etc)")
+
+        resoluções_assinadas_pelo_presidente = self.keyword_search(
+            columns=[self.df.assinatura],
+            keywords=["RICARDO LIÁO"],
+            where=(self.df.secao.str.contains("DO1"))
+            & (self.df.tipo_normativo == "Resolução"),
+        ).assign(motivo="Resolução assinada pelo presidente do COAF")
+
+        return pd.concat(
+            [ausencia_do_presidente, resoluções_assinadas_pelo_presidente]
+        ).drop_duplicates(subset="id")
 
     def gerar_sumula(self) -> pd.DataFrame:
         return pd.concat(
             [
-                self.assinaturas_dos_diretores_e_presidente(),
+                self.assinaturas_dos_diretores_e_presidente_do_BC(),
                 self.atos_e_resolucoes_do_CMN(),
                 self.banco_central_secao_1(),
                 self.posse_e_exoneracao_de_cargo(),

@@ -1,12 +1,11 @@
 import datetime
-from typing import Dict, List
+from typing import List
 import pandas as pd
 import re
-from subjects.banco_central import BancoCentral
+from interesses.banco_central import BancoCentral
+from interesses.geral import Geral
 
-
-from terms import ASSINATURAS, TERMOS_DE_POSSE
-from utils import ColumnSearch, tirar_acentuacao
+from utils import ColumnSearch
 
 
 class Search:
@@ -19,18 +18,27 @@ class Search:
     @property
     def banco_central(self):
         return BancoCentral(self)
+        
+    @property
+    def geral(self):
+        return Geral(self)
+        
 
     def gerar_sumula(self) -> pd.DataFrame:
         return pd.concat(
             [
-                self.assinaturas_dos_diretores_e_presidente_do_BC(),
-                self.atos_e_resolucoes_do_CMN(),
-                self.banco_central_secao_1(),
-                self.posse_e_exoneracao_de_cargo(),
+                self.banco_central.assinaturas_dos_diretores_e_presidente(), 
+                self.banco_central.publicacoes_DO1(),
+                self.banco_central.orgao_importante_menciona_o_banco_central_na_ementa(),
+                self.geral.atos_e_resolucoes_do_CMN(),
+                self.geral.posse_e_exoneracao_de_cargo(),
+                self.geral.coaf(),
             ]
         ).drop_duplicates(subset="id")
 
     def keyword_search(self, searches: List[ColumnSearch], where=None) -> pd.DataFrame:
+        # TODO Deixar essa função mais clean
+        
         """Retorna as publicacões que tiverem todos os termos explicitados em [searches]"""
 
         result_df = self.df

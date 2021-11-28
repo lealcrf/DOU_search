@@ -2,6 +2,7 @@ import datetime
 from typing import Dict, List
 import pandas as pd
 import re
+from subjects.banco_central import BancoCentral
 
 
 from terms import ASSINATURAS, TERMOS_DE_POSSE
@@ -15,65 +16,9 @@ class Search:
         else:
             self.df = df[df.data == date] if date is not None else df
 
-    def keyword_search(self, searches: List[ColumnSearch], where=None) -> pd.DataFrame:
-        """Retorna as publicacões que tiverem todos os termos explicitados em [searches]"""
-
-        result_df = self.df
-
-        # Faz cada pesquisa individualmente, sendo o resultado da última o input da próxima
-        for search in searches:
-            key_words_regex = f'({"|".join(search.keywords)})'
-
-            result_df = result_df[
-                search.column.str.contains(
-                    key_words_regex, flags=re.IGNORECASE, regex=True, na=False
-                )
-            ]
-
-        if where is None:
-            return result_df
-
-        return result_df[where]
-
-    def atos_e_resolucoes_do_CMN(self):
-        """Qualquer ato do CMN entra na súmula"""
-        return self.keyword_search(
-            columns=[self.df.titulo],
-            keywords=[r"\sCMN\s"],
-        ).assign(motivo="Ato do CMN")
-
-    def posse_e_exoneracao_de_cargo(self):
-        """Toda posse/exoneração de um cargo importante vai pra súmula"""
-
-        return self.keyword_search(
-            columns=[self.df.conteudo, self.df.titulo],
-            keywords=TERMOS_DE_POSSE,
-        ).assign(motivo="posse e exoneração de cargo")
-
-    # def afastamentos(self):
-    #     return self.keyword_search(
-    #         columns=[self.df.conteudo],
-    #         keywords=TERMOS_DE_AFASTAMENTO,
-    #     ).assign(motivo="Afastamento")
-
-    def coaf(self):
-        ausencia_do_presidente = self.keyword_search(
-            columns=[self.df.conteudo],
-            keywords=[
-                "Despacho do Presidente do Banco Central do Brasil.+Presidente do COAF"
-            ],  # Sempre que o presidente do COAF se ausenta, o Presidente do Banco Central do Brasil precisa fazer um despacho
-        ).assign(motivo="Presidente do COAF se ausentou (férias, substituído, etc)")
-
-        resoluções_assinadas_pelo_presidente = self.keyword_search(
-            columns=[self.df.assinatura],
-            keywords=["RICARDO LIÁO"],
-            where=(self.df.secao.str.contains("DO1"))
-            & (self.df.tipo_normativo == "Resolução"),
-        ).assign(motivo="Resolução assinada pelo presidente do COAF")
-
-        return pd.concat(
-            [ausencia_do_presidente, resoluções_assinadas_pelo_presidente]
-        ).drop_duplicates(subset="id")
+    @property
+    def banco_central(self):
+        return BancoCentral(self)
 
     def gerar_sumula(self) -> pd.DataFrame:
         return pd.concat(
@@ -84,3 +29,29 @@ class Search:
                 self.posse_e_exoneracao_de_cargo(),
             ]
         ).drop_duplicates(subset="id")
+
+    def keyword_search(self, searches: List[ColumnSearch], where=None) -> pd.DataFrame:
+        """Retorna as publicacões que tiverem todos os termos explicitados em [searches]"""
+
+        result_df = self.df
+
+        # Faz cada pesquisa individualmente, sendo o resultado da última o input da próxima
+        for search in searches:
+            dfs = []
+
+            for column in search.columns:
+                key_words_regex = f'({"|".join(search.keywords)})'
+
+                dfs.append(
+                    result_df[
+                        column.str.contains(
+                            key_words_regex, flags=re.IGNORECASE, regex=True, na=False
+                        )
+                    ]
+                )
+            result_df = pd.concat(dfs).drop_duplicates(subset="id")
+
+        if where is None:
+            return result_df
+
+        return result_df[where]

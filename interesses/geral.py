@@ -21,10 +21,13 @@ class Geral:
             searches=[ColumnSearch([self._df.conteudo], TERMOS_DE_POSSE)],
         ).assign(motivo="posse e exoneração de cargo")
 
+    # def afastamento(self):
+        
+
     def coaf(self):
         """
         - Quando o presidente do COAF se ausenta, é substituido em caso de férias ou faz uma viagem
-        - Quando uma Resolução é assinada pelo presidente do COAF no DO1
+        - Quando uma portaria é assinada pelo presidente do COAF
         """
 
         # Sempre que o presidente do COAF se ausenta, o Presidente do Banco Central do Brasil precisa fazer um despacho
@@ -41,9 +44,8 @@ class Geral:
 
         resoluções_assinadas_pelo_presidente = self.search.keyword_search(
             searches=[ColumnSearch([self._df.assinatura], keywords=["RICARDO LIÁO"])],
-            where=(self._df.secao.str.contains("DO1"))
-            & (self._df.tipo_normativo == "Resolução"),
-        ).assign(motivo="Resolução assinada pelo presidente do COAF")
+            where=self._df.tipo_normativo == "Portaria",
+        ).assign(motivo="Portaria assinada pelo pelo presidente do COAF")
 
         return pd.concat(
             [ausencia_do_presidente, resoluções_assinadas_pelo_presidente]
@@ -51,10 +53,10 @@ class Geral:
 
 TERMOS_DE_POSSE = [
     # Assunto 6:
-    "cargo de Presidente do Banco Central do Brasil",
+    "cargo de Presidente do Banco Central",
     # Assunto 7:
-    "cargo de Diretor do Banco Central do Brasil",
-    "cargo de Diretora do Banco Central do Brasil",
+    "cargo de Diretor do Banco Central",
+    "cargo de Diretora do Banco Central",
     # Assunto 11:
     "cargo de Secretário Especial de Fazenda do Ministério da Economia",
     # Assunto 12:

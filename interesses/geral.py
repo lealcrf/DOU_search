@@ -18,11 +18,10 @@ class Geral:
         """Toda posse/exoneração de um cargo importante vai pra súmula"""
 
         return self.search.keyword_search(
-            searches=[ColumnSearch([self._df.conteudo], TERMOS_DE_POSSE)],
+            searches=[ColumnSearch([self._df.conteudo], POSSE_E_EXONERACAO)],
         ).assign(motivo="posse e exoneração de cargo")
 
     # def afastamento(self):
-        
 
     def coaf(self):
         """
@@ -51,7 +50,13 @@ class Geral:
             [ausencia_do_presidente, resoluções_assinadas_pelo_presidente]
         ).drop_duplicates(subset="id")
 
-TERMOS_DE_POSSE = [
+    def filtragem_conteudo(self):
+        return self.search.keyword_search(
+            search=[ColumnSearch([self._df.conteudo], KEYWORDS_CONTEUDO)],
+        ).assign(motivo="contém alguma das frases explicitadas em KEYWORDS_CONTEUDO")
+
+
+POSSE_E_EXONERACAO = [
     # Assunto 6:
     "cargo de Presidente do Banco Central",
     # Assunto 7:
@@ -86,4 +91,8 @@ TERMOS_DE_POSSE = [
     "cargo de Ministro de Estado da Economia",
     #
     "cargo de Ministro de Estado do Trabalho e Previdência",
+]
+
+KEYWORDS_CONTEUDO = [
+    "Comissão Técnica da Moeda e do Crédito",
 ]

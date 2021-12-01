@@ -9,11 +9,8 @@ from utils import ColumnSearch
 
 
 class Search:
-    def __init__(self, df: pd.DataFrame, date: datetime.date = None, is_csv=False):
-        if is_csv:
-            self.df = df[df.data == str(date)] if date is not None else df
-        else:
-            self.df = df[df.data == date] if date is not None else df
+    def __init__(self, df: pd.DataFrame, date: datetime.date = None):
+        self.df = df[df.data == date] if date is not None else df
 
     @property
     def banco_central(self):

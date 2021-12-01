@@ -8,22 +8,24 @@ from model import Publicacao
 
 
 class PublicacoesDB:
-    def __init__(self):
-        with open("credentials.json", "r") as f:
-            cred = json.loads(f.read())
-
-            # self._conn = mysql.connector.connect(
-            #     host=cred["ENDPOINT"],
-            #     user=cred["USER"],
-            #     password=cred["PASSWORD"],
-            #     database=cred["DATABASE"],
-            # )
+    def __init__(self, is_local=True):
+        if is_local:
             self._conn = mysql.connector.connect(
                 host="127.0.0.1",
                 user="root",
                 password="oasuet10",
                 database="dou_db_local",
             )
+        else:
+            with open("credentials.json", "r") as f:
+                cred = json.loads(f.read())
+
+                self._conn = mysql.connector.connect(
+                    host=cred["ENDPOINT"],
+                    user=cred["USER"],
+                    password=cred["PASSWORD"],
+                    database=cred["DATABASE"],
+                )
 
         self._cursor = self._conn.cursor()
 

@@ -18,3 +18,5 @@ class Publicacao:
     ementa: str
     conteudo: str
     assinatura: str
+    pdf:str
+    id_materia:str

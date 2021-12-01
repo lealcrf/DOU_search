@@ -4,20 +4,20 @@ from utils import ColumnSearch
 
 class Geral:
     def __init__(self, search):
-        self.search = search
-        self._df = self.search.df
+        self._search = search
+        self._df = self._search.df
 
     def atos_e_resolucoes_do_CMN(self):
         """Qualquer ato do CMN entra na súmula"""
 
-        return self.search.keyword_search(
+        return self._search.keyword_search(
             searches=[ColumnSearch([self._df.titulo], [r"\sCMN\s"])]
         ).assign(motivo="Ato do CMN")
 
     def posse_e_exoneracao_de_cargo(self):
         """Toda posse/exoneração de um cargo importante vai pra súmula"""
 
-        return self.search.keyword_search(
+        return self._search.keyword_search(
             searches=[ColumnSearch([self._df.conteudo], POSSE_E_EXONERACAO)],
         ).assign(motivo="posse e exoneração de cargo")
 
@@ -30,7 +30,7 @@ class Geral:
         """
 
         # Sempre que o presidente do COAF se ausenta, o Presidente do Banco Central do Brasil precisa fazer um despacho
-        ausencia_do_presidente = self.search.keyword_search(
+        ausencia_do_presidente = self._search.keyword_search(
             searches=[
                 ColumnSearch(
                     [self._df.conteudo],
@@ -41,7 +41,7 @@ class Geral:
             ]
         ).assign(motivo="Presidente do COAF se ausentou (férias, substituído, etc)")
 
-        resoluções_assinadas_pelo_presidente = self.search.keyword_search(
+        resoluções_assinadas_pelo_presidente = self._search.keyword_search(
             searches=[ColumnSearch([self._df.assinatura], keywords=["RICARDO LIÁO"])],
             where=self._df.tipo_normativo == "Portaria",
         ).assign(motivo="Portaria assinada pelo pelo presidente do COAF")
@@ -51,8 +51,8 @@ class Geral:
         ).drop_duplicates(subset="id")
 
     def filtragem_conteudo(self):
-        return self.search.keyword_search(
-            search=[ColumnSearch([self._df.conteudo], KEYWORDS_CONTEUDO)],
+        return self._search.keyword_search(
+            searches=[ColumnSearch([self._df.conteudo], KEYWORDS_CONTEUDO)],
         ).assign(motivo="contém alguma das frases explicitadas em KEYWORDS_CONTEUDO")
 
 

@@ -29,7 +29,13 @@ class Search:
                 self.banco_central.orgao_importante_menciona_o_banco_central_na_ementa(),
                 self.geral.atos_e_resolucoes_do_CMN(),
                 self.geral.posse_e_exoneracao_de_cargo(),
+                self.geral.afastamento(),
+                self.geral.instrucao_normativa_misterio_da_economia_administracao_publica(),
                 self.geral.coaf(),
+                self.geral.filtrar_por_conteudo(),
+                self.geral.filtrar_por_titulo(),
+                self.geral.filtrar_por_ementa(),
+                
             ]
         ).drop_duplicates(subset="id")
 

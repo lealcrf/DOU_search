@@ -21,8 +21,26 @@ class Geral:
             searches=[ColumnSearch([self._df.conteudo], POSSE_E_EXONERACAO)],
         ).assign(motivo="posse e exoneração de cargo")
 
-    # def afastamento(self):
+    def afastamento(self):
+        return self._search.keyword_search(
+            searches=[ColumnSearch([self._df.conteudo], AFASTAMENTO)],
+        ).assign(motivo="Afastamento")
 
+    def instrucao_normativa_misterio_da_economia_administracao_publica(self):
+        return self._search.keyword_search(
+            searches=[
+                ColumnSearch(
+                    [self._df.ementa],
+                    ["Administração Pública federal direta, autárquica e fundacional"],
+                ),
+                # ColumnSearch([self._df.tipo_normativo], ["Instrução Normativa"]),
+                ColumnSearch([self._df.escopo], ["Ministério da Economia"]),
+            ],
+        ).assign(
+            motivo="'Administração Pública federal direta, autárquica e fundacional' na ementa de Instruções normativas do Ministério da Economia"
+        )
+
+    # TODO Tirar isso daqui e separar para afastamento e assinatura
     def coaf(self):
         """
         - Quando o presidente do COAF se ausenta, é substituido em caso de férias ou faz uma viagem
@@ -50,11 +68,28 @@ class Geral:
             [ausencia_do_presidente, resoluções_assinadas_pelo_presidente]
         ).drop_duplicates(subset="id")
 
-    def filtragem_conteudo(self):
+    def filtrar_por_conteudo(self):
         return self._search.keyword_search(
             searches=[ColumnSearch([self._df.conteudo], KEYWORDS_CONTEUDO)],
         ).assign(motivo="contém alguma das frases explicitadas em KEYWORDS_CONTEUDO")
 
+    def filtrar_por_titulo(self):
+        return self._search.keyword_search(
+            searches=[ColumnSearch([self._df.titulo], KEYWORDS_TITULO)],
+        ).assign(motivo="contém alguma das frases explicitadas em KEYWORDS_TITULO")
+
+    def filtrar_por_ementa(self):
+        return self._search.keyword_search(
+            searches=[ColumnSearch([self._df.ementa], KEYWORDS_EMENTA)],
+        ).assign(motivo="contém alguma das frases explicitadas em KEYWORDS_EMENTA")
+
+
+AFASTAMENTO = [
+    "(Exposição|Exposições) de Motivos.+Presidente do Banco Central do Brasil",
+    "(Exposição|Exposições) de Motivos.+Ministro de Estado da Economia",
+    "A DIRETORA DE ADMINISTRAÇÃO DO BANCO CENTRAL DO BRASIL",
+    "PORTARIA.+O MINISTRO DE ESTADO DA ECONOMIA;+afastamento",
+]
 
 POSSE_E_EXONERACAO = [
     # Assunto 6:
@@ -95,4 +130,15 @@ POSSE_E_EXONERACAO = [
 
 KEYWORDS_CONTEUDO = [
     "Comissão Técnica da Moeda e do Crédito",
+    "Secretário-Executivo Adjunto da Secretaria-Executiva do Ministério do Trabalho e Previdência",
+    "Comitê de Regulação e Fiscalização dos Mercados Financeiro, de Capitais, de Seguros, de Previdência e Capitalização",
+]
+KEYWORDS_TITULO = [
+    "Resolução Coremec",
+]
+
+KEYWORDS_EMENTA = [
+    "Lavagem de Dinheiro",
+    "Programa Nacional de Apoio às Microempresas e Empresas de Pequeno Porte",
+    "Proteção de Dados",
 ]

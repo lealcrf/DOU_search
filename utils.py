@@ -1,6 +1,5 @@
 from typing import List
 import unicodedata
-
 import pandas as pd
 
 
@@ -37,3 +36,17 @@ class ColumnSearch:
             self.keywords = [tirar_acentuacao(i) for i in keywords]
         else:
             self.keywords = keywords
+
+
+class FiltrarPorCategoria:
+    def __init__(self, filtro):
+        self._filtro = filtro
+
+    def aplicar_filtros(self):
+        results = []
+        for name in dir(self):
+            obj = getattr(self, name)
+            if callable(obj) and name != "aplicar_filtros" and name[:2] != "__":
+                results.append(obj())
+
+        return pd.concat(results).drop_duplicates(subset="id")

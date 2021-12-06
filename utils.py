@@ -38,15 +38,15 @@ class ColumnSearch:
             self.keywords = keywords
 
 
-class FiltrarPorCategoria:
+class FiltrarPorCategoria(type):
     def __init__(self, filtro):
         self._filtro = filtro
 
-    def aplicar_filtros(self):
+    def __call__(self):
         results = []
         for name in dir(self):
             obj = getattr(self, name)
-            if callable(obj) and name != "aplicar_filtros" and name[:2] != "__":
+            if callable(obj) and name[:2] != "__":
                 results.append(obj())
 
         return pd.concat(results).drop_duplicates(subset="id")

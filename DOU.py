@@ -19,10 +19,10 @@ class DOU:
     def gerar_sumula(self) -> pd.DataFrame:
         return pd.concat(
             [
-                self.filtrar.por_motivo_geral.aplicar_filtros(),
-                self.filtrar.por_titulo.aplicar_filtros(),
-                self.filtrar.por_ementa.aplicar_filtros(),
-                self.filtrar.por_conteudo.aplicar_filtros(),
-                self.filtrar.por_assinatura.aplicar_filtros(),
+                self.filtrar.por_motivo_geral(),
+                self.filtrar.por_titulo(),
+                self.filtrar.por_ementa(),
+                self.filtrar.por_conteudo(),
+                self.filtrar.por_assinatura(),
             ]
         ).drop_duplicates(subset="id")

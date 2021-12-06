@@ -27,6 +27,10 @@ NOMEACAO_E_EXONERACAO = [
     # Assunto 7:
     "cargo de Diretor do Banco Central",
     "cargo de Diretora do Banco Central",
+    # Assunto 10:
+    "cargo de Ministro de Estado da Economia",
+    # -?
+    "cargo de Ministro de Estado do Trabalho e Previdência",
     # Assunto 11:
     "cargo de Secretário Especial de Fazenda do Ministério da Economia",
     # Assunto 12:
@@ -35,8 +39,6 @@ NOMEACAO_E_EXONERACAO = [
     "cargo de Secretário de Política Econômica",
     # Assunto 14:
     "cargo de Secretário do Tesouro Nacional",
-    # Segunda reunião - Assunto 3
-    "cargo de Secretário Especial do Tesouro e Orçamento do Ministério da Economia",
     # Assunto 15:
     "cargo de Presidente da Casa da Moeda do Brasil",
     # Assunto 16:
@@ -54,10 +56,12 @@ NOMEACAO_E_EXONERACAO = [
     # Assunto 22:
     "cargo de Secretário-Executivo do Ministério do Trabalho e Previdência",
     ###################################################################
-    # Assunto 10:
-    "cargo de Ministro de Estado da Economia",
-    #
-    "cargo de Ministro de Estado do Trabalho e Previdência",
+    # Segunda reunião - Assunto 3
+    "cargo de Secretário Especial do Tesouro e Orçamento do Ministério da Economia",
+    # Segunda reunião - Assunto 9
+    "cargo de Procurador-Geral Federal da Advocacia-Geral da União",
+    
+    
 ]
 
 KEYWORDS_CONTEUDO = [
@@ -79,5 +83,11 @@ KEYWORDS_EMENTA = [
     "Subdelega competências para a prática de atos de gestão de pessoas no âmbito do Ministério da Economia às autoridades que menciona",
     # Segunda reunião - Assunto 8
     "Sistema de Pessoal Civil da Administração Federal",
+    # Segunda reunião - Assunto 11
+    "Lei nº 8.429",
+    # Segunda reunião - Assunto 11
+    "Lei nº 14.133",
+    # Segunda reunião - Assunto extra,
+    "Programa de Estímulo ao Crédito",
     
 ]

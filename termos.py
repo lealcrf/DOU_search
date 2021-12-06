@@ -35,7 +35,7 @@ NOMEACAO_E_EXONERACAO = [
     "cargo de Secretário de Política Econômica",
     # Assunto 14:
     "cargo de Secretário do Tesouro Nacional",
-    # Anotações da segunda reunião - Assunto 3
+    # Segunda reunião - Assunto 3
     "cargo de Secretário Especial do Tesouro e Orçamento do Ministério da Economia",
     # Assunto 15:
     "cargo de Presidente da Casa da Moeda do Brasil",
@@ -73,4 +73,10 @@ KEYWORDS_EMENTA = [
     "Lavagem de Dinheiro",
     "Programa Nacional de Apoio às Microempresas e Empresas de Pequeno Porte",
     "Proteção de Dados",
+    # Segunda reunião - Assunto 6
+    "Decreto nº 10.835", # Solução temporária
+    # Segunda reunião - Assunto 7
+    "Subdelega competências para a prática de atos de gestão de pessoas no âmbito do Ministério da Economia às autoridades que menciona",
+    
+    
 ]

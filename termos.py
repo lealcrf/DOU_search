@@ -35,6 +35,8 @@ NOMEACAO_E_EXONERACAO = [
     "cargo de Secretário de Política Econômica",
     # Assunto 14:
     "cargo de Secretário do Tesouro Nacional",
+    # Anotações da segunda reunião - Assunto 3
+    "cargo de Secretário Especial do Tesouro e Orçamento do Ministério da Economia",
     # Assunto 15:
     "cargo de Presidente da Casa da Moeda do Brasil",
     # Assunto 16:

@@ -77,6 +77,7 @@ KEYWORDS_EMENTA = [
     "Decreto nº 10.835", # Solução temporária
     # Segunda reunião - Assunto 7
     "Subdelega competências para a prática de atos de gestão de pessoas no âmbito do Ministério da Economia às autoridades que menciona",
-    
+    # Segunda reunião - Assunto 8
+    "Sistema de Pessoal Civil da Administração Federal",
     
 ]

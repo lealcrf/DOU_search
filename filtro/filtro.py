@@ -1,9 +1,13 @@
 from typing import List
 import pandas as pd
 import re
+import utils
 
-from .categorias.por_assinatura import FiltragemPorAssinatura
+from pandas.core.frame import DataFrame
+
 from .categorias.por_conteudo import FiltragemPorConteudo
+from .categorias.por_escopo import FiltragemPorEscopo
+from .categorias.por_assinatura import FiltragemPorAssinatura
 from .categorias.por_titulo import FiltragemPorTitulo
 from .categorias.por_ementa import FiltragemPorEmenta
 from .categorias.por_motivo_geral import FiltragemPorMotivoGeral
@@ -12,12 +16,17 @@ from utils import ColumnSearch
 
 
 class Filtro:
-    def __init__(self, df):
+    def __init__(self, df: DataFrame):
         self.df = df
+        self.df.assinatura = df.assinatura.apply(utils.tirar_acentuacao)
 
     @property
     def por_conteudo(self):
         return FiltragemPorConteudo(self)
+
+    @property
+    def por_escopo(self):
+        return FiltragemPorEscopo(self)
 
     @property
     def por_titulo(self):
@@ -36,30 +45,15 @@ class Filtro:
         return FiltragemPorMotivoGeral(self)
 
     def keyword_search(self, searches: List[ColumnSearch], where=None) -> pd.DataFrame:
-        # TODO Deixar essa função mais clean
-
         """Retorna as publicacões que tiverem todos os termos explicitados em [searches]"""
 
         result_df = self.df
 
         # Faz cada pesquisa individualmente, sendo o resultado da última o input da próxima
         for search in searches:
-            dfs = []
-
-            for column in search.columns:
-                key_words_regex = f'({"|".join(search.keywords)})'
-
-                dfs.append(
-                    result_df[
-                        column.str.contains(
-                            key_words_regex, flags=re.IGNORECASE, regex=True, na=False
-                        )
-                    ]
-                )
-            result_df = pd.concat(dfs).drop_duplicates(subset="id")
+            result_df = search.get_result(result_df)
 
         if where is None:
             return result_df
 
         return result_df[where]
-

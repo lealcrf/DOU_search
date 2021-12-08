@@ -4,7 +4,8 @@ class FiltrarPorCategoria:
     def __init__(self, filtro):
         self._filtro = filtro
         self._df = filtro.df
-
+        
+ 
     def __call__(self) -> pd.DataFrame:
         """ Executa todas as funções da classe, junta os resultados e os devolve como um DataFrame """
         results = []

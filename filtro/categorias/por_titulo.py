@@ -1,17 +1,32 @@
-from termos import KEYWORDS_TITULO
-from utils import ColumnSearch, FiltrarPorCategoria
+from utils import ColumnSearch, Pattern
+from .filtrar_por_categoria import FiltrarPorCategoria
 
 
 class FiltragemPorTitulo(FiltrarPorCategoria):
-        
     def filtrar_por_titulo(self):
         return self._filtro.keyword_search(
-            searches=[ColumnSearch([self._filtro.df.titulo], KEYWORDS_TITULO)],
-        ).assign(motivo="contém alguma das frases explicitadas em KEYWORDS_TITULO")
-        
-    def atos_e_resolucoes_do_CMN(self):
-        """Qualquer ato do CMN entra na súmula"""
+            searches=[
+                ColumnSearch(
+                    self._df.titulo,
+                    [
+                        Pattern("Resolução Coremec", assunto="A39"),
+                        Pattern(r"\sCMN\W", assunto="A43"),
+                    ],
+                )
+            ],
+        )
 
-        return self._filtro.keyword_search(
-            searches=[ColumnSearch([self._filtro.df.titulo], [r"\sCMN\W"])]
-        ).assign(motivo="Ato do CMN")
+    def banco_central_na_ementa(self):
+        self._filtro.keyword_search(
+            searches=[
+                ColumnSearch(
+                    self._df.titulo,
+                    [
+                        Pattern("SUSEP", assunto="R1"),
+                        Pattern("PREVIC", assunto="R1"),
+                        Pattern("CONAF", assunto="R1"),
+                    ],
+                ),
+                ColumnSearch(self._df.ementa, [Pattern("Banco Central")]),
+            ]
+        )

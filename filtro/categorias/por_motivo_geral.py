@@ -1,4 +1,6 @@
-from utils import ColumnSearch, FiltrarPorCategoria
+from utils import ColumnSearch, Pattern
+from .filtrar_por_categoria import FiltrarPorCategoria
+
 
 
 class FiltragemPorMotivoGeral(FiltrarPorCategoria):
@@ -7,8 +9,8 @@ class FiltragemPorMotivoGeral(FiltrarPorCategoria):
 
         return self._filtro.keyword_search(
             searches=[
-                ColumnSearch([self._filtro.df.escopo], ["Banco Central"]),
-                ColumnSearch([self._filtro.df.secao], ["DO1"]),
+                ColumnSearch(self._df.escopo, [Pattern("Banco Central")]),
+                ColumnSearch(self._df.secao, [Pattern("DO1")]),
             ],
-            where=(self._filtro.df.tipo_normativo != "Instrução Normativa"),
+            where=(self._df.tipo_normativo != "Instrução Normativa"),
         ).assign(motivo="Publicação do BC no DO1 que não é intrução normativa")

@@ -1,59 +1,47 @@
-from typing import List
-import pandas as pd
 import re
-import utils
-
-from pandas.core.frame import DataFrame
-
-from .categorias.por_conteudo import FiltragemPorConteudo
-from .categorias.por_escopo import FiltragemPorEscopo
-from .categorias.por_assinatura import FiltragemPorAssinatura
-from .categorias.por_titulo import FiltragemPorTitulo
-from .categorias.por_ementa import FiltragemPorEmenta
-from .categorias.por_motivo_geral import FiltragemPorMotivoGeral
-
-from utils import ColumnSearch
+import pandas as pd
+from pandas.core.series import Series
+from utils import tirar_acentuacao
 
 
 class Filtro:
-    def __init__(self, df: DataFrame):
-        self.df = df
-        self.df.assinatura = df.assinatura.apply(utils.tirar_acentuacao)
+    def __init__(self, dou):
+        self._df = dou.df
+        self._df.assinatura = self._df.assinatura.apply(tirar_acentuacao)
 
-    @property
-    def por_conteudo(self):
-        return FiltragemPorConteudo(self)
+    def __call__(self) -> pd.DataFrame:
+        """Executa todas as funções da classe, junta os resultados e os devolve como um DataFrame"""
+        results = []
+        for name in dir(self):
+            obj = getattr(self, name)
+            if callable(obj) and name[:2] != "__" and name not in ["match", "query"]:
+                results.append(obj())
 
-    @property
-    def por_escopo(self):
-        return FiltragemPorEscopo(self)
+        return pd.concat(results).drop_duplicates(subset="id")
 
-    @property
-    def por_titulo(self):
-        return FiltragemPorTitulo(self)
+    def match(self, col: Series, patterns) -> Series:
+        # patterns pode ser tanto uma str quanto uma List
+        if type(patterns) is list:
+            patterns = f'({"|".join(patterns)})'
+        else:
+            patterns = "({})".format(patterns)
 
-    @property
-    def por_ementa(self):
-        return FiltragemPorEmenta(self)
+        # Já que tiramos a acentuação do [df.assinatura], temos que fazer o mesmo com os padrões
+        if col.name == "assinatura":
+            patterns = tirar_acentuacao(patterns)
 
-    @property
-    def por_assinatura(self):
-        return FiltragemPorAssinatura(self)
+        res = col.str.extract(
+            patterns,
+            flags=re.IGNORECASE,
+            expand=False,
+        )
 
-    @property
-    def por_motivo_geral(self):
-        return FiltragemPorMotivoGeral(self)
+        self._df["motivo"] = col.name + "(" + res + ")"
 
-    def keyword_search(self, searches: List[ColumnSearch], where=None) -> pd.DataFrame:
-        """Retorna as publicacões que tiverem todos os termos explicitados em [searches]"""
+        return res.notna()
 
-        result_df = self.df
+    def query(self, filtro: Series, motivo=None) -> pd.DataFrame:
+        if motivo:
+            return self._df[filtro].assign(motivo=motivo)
 
-        # Faz cada pesquisa individualmente, sendo o resultado da última o input da próxima
-        for search in searches:
-            result_df = search.get_result(result_df)
-
-        if where is None:
-            return result_df
-
-        return result_df[where]
+        return self._df[filtro]

@@ -1,16 +1,11 @@
-from utils import ColumnSearch, Pattern
-from .filtrar_por_categoria import FiltrarPorCategoria
+from ..filtro import Filtro
 
 
-
-class FiltragemPorMotivoGeral(FiltrarPorCategoria):
-    def publicacoes_DO1(self):
-        """Todos as publicacões que não sejam Instruções normativas do Banco Central no DO1 entram na súmula"""
-
-        return self._filtro.keyword_search(
-            searches=[
-                ColumnSearch(self._df.escopo, [Pattern("Banco Central")]),
-                ColumnSearch(self._df.secao, [Pattern("DO1")]),
-            ],
-            where=(self._df.tipo_normativo != "Instrução Normativa"),
-        ).assign(motivo="Publicação do BC no DO1 que não é intrução normativa")
+class FiltragemPorMotivoGeral(Filtro):
+    def publicacoes_BC_DO1_nao_IN(self):
+        return self.query(
+            self.match(self._df.escopo, "Banco Central")
+            & self.match(self._df.secao, "DO1")
+            & (self._df.tipo_normativo != "Instrução Normativa"),
+            motivo="Publicação do Banco Central no DO1 que não é intrução normativa",
+        )

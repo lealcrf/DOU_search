@@ -1,34 +1,17 @@
-from utils import ColumnSearch, Pattern
-from .filtrar_por_categoria import FiltrarPorCategoria
+from ..filtro import Filtro
 
 
-class FiltragemPorEscopo(FiltrarPorCategoria):
+class FiltragemPorEscopo(Filtro):
     def banco_central_no_conteudo(self):
-        return self._filtro.keyword_search(
-            searches=[
-                ColumnSearch(
-                    self._df.escopo,
-                    [
-                        Pattern(
-                            "Gabinete de Segurança Institucional",
-                            assunto="R2A10",
-                        )
-                    ],
-                ),
-                ColumnSearch(
-                    self._df.conteudo,
-                    [Pattern("Banco Central")],
-                ),
-            ]
+        return self.query(
+            self.match(self._df.escopo, "Gabinete de Segurança Institucional")
+            & self.match(self._df.conteudo, "Banco Central"),  # R2A10
+            motivo="Gabinete de Segurança Institucional no escopo e menciona Banco Central no conteúdo",
         )
 
     def banco_central_na_ementa(self):
-        return self._filtro.keyword_search(
-            searches=[
-                ColumnSearch(
-                    self._df.escopo,
-                    [Pattern("Secretaria Especial do Tesouro e Orçamento")],
-                ),
-                ColumnSearch(self._df.ementa, [Pattern("Banco Central")]),
-            ]
+        return self.query(
+            self.match(self._df.escopo, "Secretaria Especial do Tesouro e Orçamento")
+            & self.match(self._df.ementa, "Banco Central"),
+            motivo="'Secretaria Especial do Tesouro e Orçamento' no escopo e menciona o Banco Central no conteúdo",
         )

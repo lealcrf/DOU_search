@@ -39,9 +39,9 @@ class FiltragemPorConteudo(Filtro):
             self.match(
                 self._df.conteudo,
                 [
-                    "Exposi.+ de Motivos.+Presidente do Banco Central do Brasil",  # A29",
-                    "Exposi.+ de Motivos.+Ministro de Estado da Economia",  # A30",
-                    "A DIRETORA DE ADMINISTRAÇÃO DO BANCO CENTRAL DO BRASIL",  # A31",
+                    "(?:Exposição|Exposições) de Motivos.+Presidente do Banco Central do Brasil",  # A29",
+                    "(?:Exposição|Exposições) de Motivos.+Ministro de Estado da Economia",  # A30",
+                    "(?:A DIRETORA|O DIRETOR) DE ADMINISTRAÇÃO DO BANCO CENTRAL DO BRASIL",  # A31",
                     "PORTARIA.+O MINISTRO DE ESTADO DA ECONOMIA.+afastamento",  # A32",
                     "Despacho do Presidente do Banco Central do Brasil.+Presidente do COAF",  # Sempre que o presidente do COAF se ausenta, o Presidente do Banco Central do Brasil precisa fazer um despacho",
                 ],

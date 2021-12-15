@@ -7,5 +7,5 @@ class FiltragemPorMotivoGeral(Filtro):
             self.match(self._df.escopo, "Banco Central")
             & self.match(self._df.secao, "DO1")
             & (self._df.tipo_normativo != "Instrução Normativa"),
-            motivo="Publicação do Banco Central no DO1 que não é intrução normativa",
+            motivo="Publicação do Banco Central no DO1 que não é instrução normativa",
         )

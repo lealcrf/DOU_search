@@ -3,8 +3,11 @@ import json
 from mysql.connector.cursor import MySQLCursor
 from mysql.connector.connection import MySQLConnection
 import pandas as pd
-
+from pandas.core.frame import DataFrame
 from model import Publicacao
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 
 
 class PublicacoesDB:
@@ -16,16 +19,6 @@ class PublicacoesDB:
                 password="oasuet10",
                 database="dou_db_local",
             )
-        else:
-            with open("credentials.json", "r") as f:
-                cred = json.loads(f.read())
-
-                self._conn = mysql.connector.connect(
-                    host=cred["ENDPOINT"],
-                    user=cred["USER"],
-                    password=cred["PASSWORD"],
-                    database=cred["DATABASE"],
-                )
 
         self._cursor = self._conn.cursor()
 
@@ -58,6 +51,20 @@ class PublicacoesDB:
         resp = [Publicacao(*pub) for pub in self.cursor.fetchall()]
         return pd.DataFrame(resp)
 
-    def query(self, sql, params=None):
+    def query(self, sql, params=None) -> pd.DataFrame:
         self.cursor.execute(sql, params or ())
         return self._fetchall()
+
+
+class SumulaDB:
+    def __init__(self) -> None:
+        cred = credentials.Certificate("cred.json")
+        firebase_admin.initialize_app(cred, {"projectId": "sumula-dou"})
+        self.db = firestore.client()
+
+    def inserir_publicacoes(self, df: DataFrame):
+        pubs = [i.to_dict() for i in df.iloc]
+
+        for pub in pubs:
+            pub.update({"data": str(pub["data"])})
+            self.db.collection(pub["data"]).document(pub["id_materia"]).set(pub)

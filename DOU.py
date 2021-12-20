@@ -1,4 +1,3 @@
-from datetime import date
 import pandas as pd
 from pandas.core.frame import DataFrame
 from pandas.core.series import Series
@@ -12,9 +11,8 @@ from filtro.categorias.por_titulo import FiltragemPorTitulo
 
 
 class DOU:
-    def __init__(self, df: DataFrame, dia: date = None):
-        self.df = df[df.data == dia] if dia else df
-        # self.df = df[df.data >= dia] if dia else df
+    def __init__(self, df: DataFrame):
+        self.df = df
 
     @property
     def filtrar_por_assinatura(self):
@@ -50,10 +48,11 @@ class DOU:
         return pd.concat(
             [
                 self.filtrar_por_motivo_geral(),
-                self.filtrar_por_titulo(),
-                self.filtrar_por_escopo(),
-                self.filtrar_por_ementa(),
-                self.filtrar_por_conteudo(),
+                # self.filtrar_por_titulo(),
+                # self.filtrar_por_escopo(),
+                # self.filtrar_por_ementa(),
+                # self.filtrar_por_conteudo(),
+                
                 self.filtrar_por_assinatura(),
             ]
         ).drop_duplicates(subset="id")

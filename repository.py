@@ -1,5 +1,4 @@
 import mysql.connector
-import json
 from mysql.connector.cursor import MySQLCursor
 from mysql.connector.connection import MySQLConnection
 import pandas as pd
@@ -59,12 +58,27 @@ class PublicacoesDB:
 class SumulaDB:
     def __init__(self) -> None:
         cred = credentials.Certificate("cred.json")
-        firebase_admin.initialize_app(cred, {"projectId": "sumula-dou"})
-        self.db = firestore.client()
+        try:
+            firebase_admin.initialize_app(cred, {"projectId": "sumula-dou"})
+        except:
+            pass
+        self.db= firestore.client()
+    
 
     def inserir_publicacoes(self, df: DataFrame):
         pubs = [i.to_dict() for i in df.iloc]
+    
 
         for pub in pubs:
             pub.update({"data": str(pub["data"])})
-            self.db.collection(pub["data"]).document(pub["id_materia"]).set(pub)
+            self.db.collection(pub['data']).document(pub['id_materia']).set(pub)
+
+    def reset_db(self):
+        deleted = 0
+        for col in self.db.collections():
+            docs = col.stream()
+                    
+            for doc in docs:
+                doc.reference.delete()
+                deleted = deleted + 1
+            print(deleted)

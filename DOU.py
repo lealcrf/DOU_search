@@ -9,6 +9,7 @@ from filtro.categorias.por_ementa import FiltragemPorEmenta
 from filtro.categorias.por_escopo import FiltragemPorEscopo
 from filtro.categorias.por_motivo_geral import FiltragemPorMotivoGeral
 from filtro.categorias.por_titulo import FiltragemPorTitulo
+from repository import get_link_da_publicacao_ingov
 
 
 class DOU:
@@ -40,14 +41,14 @@ class DOU:
     def filtrar_por_titulo(self):
         return FiltragemPorTitulo(self)
     
-    def query(self, filtro: Series, motivo=None) -> pd.DataFrame:
-        if motivo:
-            return self.df[filtro].assign(motivo=motivo)
+    # def query(self, filtro: Series, motivo=None) -> pd.DataFrame:
+    #     if motivo:
+    #         return self.df[filtro].assign(motivo=motivo)
 
-        return self.df[filtro]
+    #     return self.df[filtro]
 
-    def gerar_sumula(self) -> pd.DataFrame:
-        return pd.concat(
+    def gerar_sumula(self, com_link_ingov = False) -> pd.DataFrame:
+        sumula = pd.concat(
             [
                 self.filtrar_por_motivo_geral(),
                 self.filtrar_por_titulo(),
@@ -57,3 +58,12 @@ class DOU:
                 self.filtrar_por_assinatura(),
             ]
         ).drop_duplicates(subset="id")
+        
+        
+        sumula.pdf = sumula.apply(lambda x: get_link_da_publicacao_ingov(x.pdf) )
+        
+        # if com_link_ingov:
+            # for pub in sumula.iloc:
+                # pub.pdf =  get_link_da_publicacao_ingov(pub.id_materia)
+                
+        return sumula

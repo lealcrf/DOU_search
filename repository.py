@@ -1,7 +1,5 @@
 import mysql.connector
 from mysql.connector import cursor
-from mysql.connector.cursor import MySQLCursor
-from mysql.connector.connection import MySQLConnection
 import pandas as pd
 from pandas.core.frame import DataFrame
 from model import Publicacao
@@ -11,10 +9,6 @@ from firebase_admin import firestore
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
-
 
 # Firestore
 firebase_admin.initialize_app(
@@ -72,8 +66,6 @@ def get_link_da_publicacao_ingov(id_materia: str) -> str:
     driver.get(
         f'https://www.in.gov.br/consulta/-/buscar/dou?q="{id_materia}"&s=todos&exactDate=all&sortType=0'
     )
-
-    time.sleep(5)
 
     element: WebElement = driver.find_element(By.XPATH, "//h5[@class='title-marker']/a")
     link = element.get_property("href")

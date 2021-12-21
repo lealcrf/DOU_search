@@ -1,5 +1,5 @@
 import mysql.connector
-import json
+from mysql.connector import cursor
 from mysql.connector.cursor import MySQLCursor
 from mysql.connector.connection import MySQLConnection
 import pandas as pd
@@ -8,63 +8,75 @@ from model import Publicacao
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
 
 
-class PublicacoesDB:
-    def __init__(self, is_local=True):
-        if is_local:
-            self._conn = mysql.connector.connect(
-                host="127.0.0.1",
-                user="root",
-                password="oasuet10",
-                database="dou_db_local",
-            )
+# Firestore
+firebase_admin.initialize_app(
+    credential=credentials.Certificate("cred.json"),
+    options={"projectId": "sumula-dou"},
+)
+db = firestore.client()
 
-        self._cursor = self._conn.cursor()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self._close()
-
-    @property
-    def connection(self) -> MySQLConnection:
-        return self._conn
-
-    @property
-    def cursor(self) -> MySQLCursor:
-        return self._cursor
-
-    def commit(self):
-        self.connection.commit()
-
-    def _close(self, commit=False):
-        if commit:
-            self.commit()
-        self.connection.close()
-
-    def execute(self, sql, params=None):
-        self.cursor.execute(sql, params or ())
-
-    def _fetchall(self):
-        resp = [Publicacao(*pub) for pub in self.cursor.fetchall()]
-        return pd.DataFrame(resp)
-
-    def query(self, sql, params=None) -> pd.DataFrame:
-        self.cursor.execute(sql, params or ())
-        return self._fetchall()
+# MySQL local
+conn = mysql.connector.connect(
+    host="127.0.0.1",
+    user="root",
+    password="oasuet10",
+    database="dou_db_local",
+)
+cursor = conn.cursor()
 
 
-class SumulaDB:
-    def __init__(self) -> None:
-        cred = credentials.Certificate("cred.json")
-        firebase_admin.initialize_app(cred, {"projectId": "sumula-dou"})
-        self.db = firestore.client()
+def pegar_publicacoes_do_DOU_DB(n_ultimas_publicacoes: int = None) -> DataFrame:
+    """Pega publicacoes do banco de dados onde guardamos todas as DOU's
 
-    def inserir_publicacoes(self, df: DataFrame):
-        pubs = [i.to_dict() for i in df.iloc]
+    ## Parametros
 
-        for pub in pubs:
-            pub.update({"data": str(pub["data"])})
-            self.db.collection(pub["data"]).document(pub["id_materia"]).set(pub)
+    n_ultimas_publicacoes: pega as n publicações mais recentes
+    """
+
+    sql = "SELECT * FROM publicacoes {}".format(
+        f"ORDER BY data DESC LIMIT {n_ultimas_publicacoes}"
+        if n_ultimas_publicacoes
+        else ""
+    )
+    cursor.execute(sql)
+
+    df = pd.DataFrame(Publicacao(*pub) for pub in cursor.fetchall())
+
+    return df
+    
+
+def inserir_publicacoes_sumulaDB(self, df: DataFrame):
+    """Coloca as publicações na base de dados da súmula (firestore)"""
+
+    pubs = [i.to_dict() for i in df.iloc]
+
+    for pub in pubs:
+        pub.update({"data": str(pub["data"])})
+        db.collection(pub["data"]).document(pub["id_materia"]).set(pub)
+
+
+def get_link_da_publicacao_ingov(id_materia: str) -> str:
+    """Faz um scrape para achar o link da do site in.gov baseado no id da matéria"""
+
+    options = webdriver.ChromeOptions()
+    options.headless = True
+    driver = webdriver.Chrome(options=options)
+    driver.get(
+        f'https://www.in.gov.br/consulta/-/buscar/dou?q="{id_materia}"&s=todos&exactDate=all&sortType=0'
+    )
+
+    time.sleep(5)
+
+    element: WebElement = driver.find_element(By.XPATH, "//h5[@class='title-marker']/a")
+    link = element.get_property("href")
+
+    driver.close()
+    return link

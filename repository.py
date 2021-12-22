@@ -47,7 +47,7 @@ def pegar_publicacoes_do_DOU_DB(n_ultimas_publicacoes: int = None) -> DataFrame:
     return df
     
 
-def inserir_publicacoes_sumulaDB(self, df: DataFrame):
+def inserir_publicacoes_sumulaDB(df: DataFrame):
     """Coloca as publicações na base de dados da súmula (firestore)"""
 
     pubs = [i.to_dict() for i in df.iloc]
@@ -59,6 +59,8 @@ def inserir_publicacoes_sumulaDB(self, df: DataFrame):
 
 def get_link_da_publicacao_ingov(id_materia: str) -> str:
     """Faz um scrape para achar o link da do site in.gov baseado no id da matéria"""
+
+    print(id_materia)
 
     options = webdriver.ChromeOptions()
     options.headless = True

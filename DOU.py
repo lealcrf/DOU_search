@@ -1,4 +1,4 @@
-from datetime import date
+from numpy import NaN
 import pandas as pd
 from pandas.core.frame import DataFrame
 from pandas.core.series import Series
@@ -13,42 +13,35 @@ from repository import get_link_da_publicacao_ingov
 
 
 class DOU:
-    def __init__(self, df: DataFrame, dia: date = None):
-        self.df = df[df.data == dia] if dia else df
-        # self.df = df[df.data >= dia] if dia else df
+    def __init__(self, df: DataFrame):
+        self.df = df
 
     @property
     def filtrar_por_assinatura(self):
-        return FiltragemPorAssinatura(self)
+        return FiltragemPorAssinatura(self.df)
 
     @property
     def filtrar_por_conteudo(self):
-        return FiltragemPorConteudo(self)
+        return FiltragemPorConteudo(self.df)
 
     @property
     def filtrar_por_ementa(self):
-        return FiltragemPorEmenta(self)
+        return FiltragemPorEmenta(self.df)
 
     @property
     def filtrar_por_escopo(self):
-        return FiltragemPorEscopo(self)
+        return FiltragemPorEscopo(self.df)
 
     @property
     def filtrar_por_motivo_geral(self):
-        return FiltragemPorMotivoGeral(self)
+        return FiltragemPorMotivoGeral(self.df)
 
     @property
     def filtrar_por_titulo(self):
-        return FiltragemPorTitulo(self)
-    
-    # def query(self, filtro: Series, motivo=None) -> pd.DataFrame:
-    #     if motivo:
-    #         return self.df[filtro].assign(motivo=motivo)
+        return FiltragemPorTitulo(self.df)
 
-    #     return self.df[filtro]
-
-    def gerar_sumula(self, com_link_ingov = False) -> pd.DataFrame:
-        sumula = pd.concat(
+    def gerar_sumula(self, com_link_ingov=False) -> pd.DataFrame:
+        resultado = pd.concat(
             [
                 self.filtrar_por_motivo_geral(),
                 self.filtrar_por_titulo(),
@@ -57,13 +50,24 @@ class DOU:
                 self.filtrar_por_conteudo(),
                 self.filtrar_por_assinatura(),
             ]
-        ).drop_duplicates(subset="id")
-        
-        
-        sumula.pdf = sumula.apply(lambda x: get_link_da_publicacao_ingov(x.pdf) )
-        
-        # if com_link_ingov:
-            # for pub in sumula.iloc:
-                # pub.pdf =  get_link_da_publicacao_ingov(pub.id_materia)
-                
+        )
+
+        # Adiciona motivo se a publicação foi achada por mais de uma categoria de filtragem
+        duplicados = resultado[resultado.duplicated("id", keep=False)]
+        sumula = resultado.drop_duplicates(subset="id")
+
+        for i in duplicados.groupby("id").groups.values():
+            index = i[0]
+
+            motivos = duplicados.loc[index].motivo.to_list()
+            motivos = "\n".join(motivos)
+
+            sumula.loc[index].motivo = motivos
+
+        # Adiciona o link para o in.gov
+        if com_link_ingov:
+            sumula["pdf"] = sumula.id_materia.apply(
+                lambda x: get_link_da_publicacao_ingov(x)
+            )
+
         return sumula

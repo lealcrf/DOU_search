@@ -1,10 +1,14 @@
 import re
 from sys import flags
-from types import ModuleType
+from types import ModuleType, NoneType
 from typing import List
-from numpy import NaN
+from numpy import NaN, isnan, nan
+import numpy
 from numpy.core.numeric import moveaxis
 import pandas as pd
+from pandas.core import series
+from pandas.core.arrays.boolean import BooleanArray
+from pandas.core.frame import DataFrame
 from pandas.core.series import Series
 from utils import tirar_acentuacao
 from teste import Pattern
@@ -12,9 +16,10 @@ import numpy as np
 
 
 class Filtro:
-    def __init__(self, dou):
-        self._df: pd.DataFrame = dou.df
-        self._df.assinatura = self._df.assinatura.apply(tirar_acentuacao)
+    def __init__(self, df: DataFrame):
+        self._df: pd.DataFrame = df.copy()
+        self._df["motivo"] = None
+        self._df.assinatura = df.assinatura.apply(tirar_acentuacao)
 
     def __call__(self) -> pd.DataFrame:
         """Executa todas as funções da classe, junta os resultados e os devolve como um DataFrame"""
@@ -31,87 +36,62 @@ class Filtro:
 
         return pd.concat(results).drop_duplicates(subset="id")
 
-    def contains(self, col: Series, patterns: Pattern | List[Pattern] | str) -> Series:
+    def contains(self, col: Series, patterns: List[Pattern] | str) -> BooleanArray:
         """Procura na coluna os items que satisfaçam algum dos padrões
 
-        - Se [patterns] for Pattern ou List[Pattern], vai adicionar o motivo contido em pattern.motivo
-        - Se [patterns] for str, faz o
-
+        - Se [patterns] for List[Pattern], vai adicionar o motivo contido em pattern.motivo na sumula
+        - Se [patterns] for str, nenhum motivo será adicionado
         """
+        pat_type = type(patterns)
 
-        p_type = type(patterns)
-
-        # Cria o regex a partir de [[patterns]]
-        if p_type is list:
+        # Cria o regex a partir das/do [[patterns]]
+        if pat_type is list:
             regex = "|".join([f"({p.regex})" for p in patterns])
-        elif p_type is Pattern:
-            regex = "({})".format(patterns.regex)
-        else:
+        else:  # se for uma string
             regex = "({})".format(patterns)
 
         # Já que tiramos a acentuação do [df.assinatura], temos que fazer o mesmo com as keywords
         if col.name == "assinatura":
             regex = tirar_acentuacao(regex)
 
-        def _pegar_motivo(row):
-            if row:
-                match = re.search(regex, row, flags=re.IGNORECASE)
+        def match(item):
+            if item:
+                match = re.search(regex, item, flags=re.IGNORECASE)
                 if match:
-                    if p_type is list:
+                    if pat_type is list:
+                        # Pega o Pattern.motivo correspondente ao regex do match
                         return patterns[match.lastindex - 1].motivo
-                    elif p_type is Pattern:
-                        return patterns.regex
-                    else:
-                        return ""
-            return np.NaN
+                    elif pat_type is str:
+                        # Temos que retornar alguma coisa pois usamos o método [notna()] para fazer o boolean vector que será retornado por essa função.
+                        return patterns
 
-        groups = col.apply(_pegar_motivo)
+        groups: Series = col.apply(match)
 
-        if p_type is not str:
-            motivos = groups.dropna()
+        if pat_type is not str:
+            tmp_df = self._df
 
-            if "motivo" not in self._df.columns:
-                self._df["motivo"] = motivos
+            def foo(antigo, novo):
+                # Caso esse for o primeiro motivo no item
+                if antigo is None and type(novo) is str:
+                    return novo
 
-            else:
-                # self._df.loc[motivos.index, "motivo"]
-
-                # print(locs.value_counts())
-
-                self._df.motivo = self._df.motivo + "\n" + motivos
-                # print(self._df.motivo.dropna())
-
-            # for row in locs.items():
-            # print(row)
-
-            # locs.apply(lambda row: row + "\n" + motivos.loc[row.index] if row else row)
-
-            # print(locs)
-
-            # locs[locs.isna()] = motivos
-
-            # x: Series = self._df[self._df.index.isin(motivos.index)].motivo
-            # print(locs + "sdasdasda" + motivos)
-            # print(x + "\n" + motivos)
-
-            # self._df.motivo = locs + "\n" + motivos
-
+                # Caso tenha mais motivos no item
+                if antigo is str and type(novo) is str:
+                    return antigo + "\n" + novo
+                
+            self._df.motivo = tmp_df.motivo.combine(groups, foo)
+        
+        
         return groups.notna()
 
-    def query(self, filtro: Series, motivo=None) -> pd.DataFrame:
-        df = self._df[filtro]
-        
-        if "motivo" in df.columns:
-            print(df.motivo,"\n|===>",  "motivo" in df.columns, motivo)
-        
+    def query(self, mask: Series, motivo=None) -> pd.DataFrame:
+        res_df = self._df[mask]
 
+        # Caso ele queira apenas 1 motivo para toda query
         if motivo:
-            if "motivo" in df.columns:
-                # df.motivo = df.motivo.apply(lambda i: f"{i}\n{motivo}" if i else motivo)
-                print(df.motivo)
+            res_df.motivo = motivo
 
-                return df
+        # Coloca essas mudanças no dataframe
+        self._df = res_df
 
-            return df.assign(motivo=motivo)
-
-        return 
+        return res_df

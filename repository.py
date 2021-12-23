@@ -10,21 +10,26 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
-# Firestore
-firebase_admin.initialize_app(
-    credential=credentials.Certificate("cred.json"),
-    options={"projectId": "sumula-dou"},
-)
-db = firestore.client()
+ja_inicializou = False
 
-# MySQL local
-conn = mysql.connector.connect(
-    host="127.0.0.1",
-    user="root",
-    password="oasuet10",
-    database="dou_db_local",
-)
-cursor = conn.cursor()
+if not ja_inicializou:
+    # Firestore
+    firebase_admin.initialize_app(
+        credential=credentials.Certificate("cred.json"),
+        options={"projectId": "sumula-dou"},
+    )
+    db = firestore.client()
+
+    # MySQL local
+    conn = mysql.connector.connect(
+        host="127.0.0.1",
+        user="root",
+        password="oasuet10",
+        database="dou_db_local",
+    )
+    cursor = conn.cursor()
+    
+    ja_inicializou = True
 
 
 def pegar_publicacoes_do_DOU_DB(n_ultimas_publicacoes: int = None) -> DataFrame:

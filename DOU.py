@@ -51,7 +51,7 @@ class DOU:
                 self.filtrar_por_assinatura(),
             ]
         )
-
+        
         # Adiciona motivo se a publicação foi achada por mais de uma categoria de filtragem
         duplicados = resultado[resultado.duplicated("id", keep=False)]
         sumula = resultado.drop_duplicates(subset="id")

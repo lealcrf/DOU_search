@@ -10,7 +10,7 @@ from teste import Pattern
 
 class Filtro:
     def __init__(self, df: DataFrame):
-        self._df: pd.DataFrame = df.copy() 
+        self._df: pd.DataFrame = df.copy()
         self._df["motivo"] = None
         self._df.assinatura = self._df.assinatura.apply(tirar_acentuacao)
 
@@ -37,17 +37,22 @@ class Filtro:
         """
         p_type = type(patterns)
 
-        # Cria o regex a partir das/do [[patterns]]
+        # | Cria o regex a partir das/do [[patterns]]
         if p_type is list:
+            # Substitui o motivo dos Patterns que tem motivo vazio por um motivo generico
+            for p in patterns:
+                p.motivo = p.completar_motivo(col.name)
+
             regex = "|".join([f"({p.regex})" for p in patterns])
-        else:  # se for uma string
+        elif p_type is str:
             regex = "({})".format(patterns)
 
         # Já que tiramos a acentuação do [df.assinatura], temos que fazer o mesmo com as keywords
         if col.name == "assinatura":
             regex = tirar_acentuacao(regex)
 
-        def _match(item):
+        # (Função Auxiliar) retorna o motivo se o item foi escolhido, caso contrário retorna None
+        def _match_motivos(item):
             if item:
                 match = re.search(regex, item, flags=re.IGNORECASE)
                 if match:
@@ -58,11 +63,12 @@ class Filtro:
                         # Temos que retornar alguma coisa pois usamos o método [notna()] para fazer o boolean vector que será retornado por essa função.
                         return patterns
 
-        groups: Series = col.apply(_match)
+        # | Cria um df contendo o motivo das publicações que entraram e None nas que não entraram
+        motivos: Series = col.apply(_match_motivos)
 
-        # Adiciona os motivos
+        # | Adiciona os motivos
         if p_type is not str:  # strings não tem motivo
-            tmp_df = self._df
+            tmp = self._df
 
             def _junta_motivo(antigo, novo):
                 # Caso esse for o primeiro motivo no item
@@ -73,12 +79,13 @@ class Filtro:
                 if antigo is str and type(novo) is str:
                     return antigo + "\n" + novo
 
-            self._df.motivo = tmp_df.motivo.combine(groups, _junta_motivo)
+            self._df.motivo = tmp.motivo.combine(motivos, _junta_motivo)
 
-        return groups.notna()
+        # | Retorna um boolean array que diz quais são os items que passaram no filtro
+        return motivos.notna()
 
-    def query(self, bool_vec: Series, motivo=None) -> pd.DataFrame:
-        res_df = self._df[bool_vec]
+    def query(self, condicoes: BooleanArray, motivo=None) -> pd.DataFrame:
+        res_df = self._df[condicoes]
 
         # Caso ele queira apenas 1 motivo para toda query
         if motivo:

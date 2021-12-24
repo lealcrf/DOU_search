@@ -17,39 +17,39 @@ class FiltragemPorAssinatura(Filtro):
                 [
                     Pattern(
                         "ROBERTO DE OLIVEIRA CAMPOS NETO",
-                        'Assinatura do Presidente do BC - "Roberto De Oliveira Campos Neto"',
+                        "Assinatura do Presidente do BC",
                     ),
                     Pattern(
                         "Maurício Costa de Moura",
-                        'Assinatura de um diretor do BC - "Maurício Costa de Moura"',
+                        "Assinatura de um diretor do BC",
                     ),
                     Pattern(
                         "Paulo sérgio Neves Souza",
-                        'Assinatura de um diretor do BC - "Paulo sérgio Neves Souza"',
+                        "Assinatura de um diretor do BC",
                     ),
                     Pattern(
                         "Fabio Kanczuk",
-                        'Assinatura de um diretor do BC - "Fabio Kanczuk"',
+                        "Assinatura de um diretor do BC",
                     ),
                     Pattern(
                         "Bruno Serra Fernandes",
-                        'Assinatura de um diretor do BC - "Bruno Serra Fernandes"',
+                        "Assinatura de um diretor do BC",
                     ),
                     Pattern(
                         "Fernanda Guardado",
-                        'Assinatura de um diretor do BC - "Fernanda Guardado"',
+                        "Assinatura de um diretor do BC",
                     ),
                     Pattern(
                         "João Manoel Pinho de Mello",
-                        'Assinatura de um diretor do BC - "João Manoel Pinho de Mello"',
+                        "Assinatura de um diretor do BC",
                     ),
                     Pattern(
                         "Otávio Ribeiro Damaso",
-                        'Assinatura de um diretor do BC - "Otávio Ribeiro Damaso"',
+                        "Assinatura de um diretor do BC",
                     ),
                     Pattern(
                         "Carolina de Assis Barros",
-                        'Assinatura de um diretor do BC - "Carolina de Assis Barros"',
+                        "Assinatura de um diretor do BC",
                     ),
                 ],
             ),

@@ -8,13 +8,10 @@ class FiltragemPorTitulo(Filtro):
             self.contains(
                 self._df.titulo,
                 [
-                    Pattern(
-                        "Resolução Coremec",
-                        "",
-                    ),  # A39
+                    Pattern("Resolução Coremec"),  # A39
                     Pattern(
                         r"\sCMN\W",
-                        "",
+                        "Resolução CMN no título",
                     ),  # A43
                 ],
             )
@@ -25,18 +22,9 @@ class FiltragemPorTitulo(Filtro):
             self.contains(
                 self._df.titulo,
                 [
-                    Pattern(
-                        "SUSEP",
-                        "",
-                    ),
-                    Pattern(
-                        "PREVIC",
-                        "",
-                    ),
-                    Pattern(
-                        "CONAF",
-                        "",
-                    ),
+                    Pattern("SUSEP"),
+                    Pattern("PREVIC"),
+                    Pattern("CONAF"),
                 ],
             )
             & self.contains(self._df.ementa, "Banco Central"),  # R1

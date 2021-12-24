@@ -1,6 +1,5 @@
 import unicodedata
 
-
 def tirar_acentuacao(string: str):
     if string is not None:
         return "".join(

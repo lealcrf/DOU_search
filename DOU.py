@@ -43,7 +43,7 @@ class DOU:
     def gerar_sumula(self, com_link_ingov=False) -> pd.DataFrame:
         resultado = pd.concat(
             [
-                self.filtrar_por_motivo_geral(),
+                # self.filtrar_por_motivo_geral(),
                 self.filtrar_por_titulo(),
                 self.filtrar_por_escopo(),
                 self.filtrar_por_ementa(),

@@ -23,9 +23,9 @@ if not ja_inicializou:
     # MySQL local
     conn = mysql.connector.connect(
         host="127.0.0.1",
-        user="root",
+        user="matheus",
         password="oasuet10",
-        database="dou_db_local",
+        database="test",
     )
     cursor = conn.cursor()
     

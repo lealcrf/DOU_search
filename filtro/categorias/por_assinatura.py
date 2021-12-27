@@ -36,7 +36,7 @@ class FiltragemPorAssinatura(Filtro):
                         "Assinatura de um diretor do BC",
                     ),
                     Pattern(
-                        "Fernanda Guardado",
+                        "(Fernanda Guardado| Fernanda Magalhaes Rumenos Guardado)",
                         "Assinatura de um diretor do BC",
                     ),
                     Pattern(

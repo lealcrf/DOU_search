@@ -29,21 +29,32 @@ class Filtro:
 
         return pd.concat(results)
 
-    def contains(self, col: Series, patterns: List[Pattern] | str) -> BooleanArray:
+    def contains(
+        self, col: Series, patterns: List[Pattern] | str | List[str]
+    ) -> BooleanArray:
         """Procura na coluna os items que satisfaçam algum dos padrões
 
         - Se [patterns] for List[Pattern], vai adicionar o motivo contido em pattern.motivo na sumula
         - Se [patterns] for str, nenhum motivo será adicionado
         """
         p_type = type(patterns)
+        inner_type = None if p_type is str else type(patterns[0])
 
         # | Cria o regex a partir das/do [[patterns]]
-        if p_type is list:
+        # Se [patters] for list[Pattern]
+        if (p_type is list) and (inner_type is Pattern):
+
             # Substitui o motivo dos Patterns que tem motivo vazio por um motivo generico
             for p in patterns:
                 p.motivo = p.completar_motivo(col.name)
 
             regex = "|".join([f"({p.regex})" for p in patterns])
+
+        # Se [patterns] for list[str]
+        elif (p_type is list) and (inner_type is str):
+            regex = "|".join(["({})".format(p) for p in patterns])
+
+        # Se [patterns] for str
         elif p_type is str:
             regex = "({})".format(patterns)
 
@@ -56,18 +67,18 @@ class Filtro:
             if item:
                 match = re.search(regex, item, flags=re.IGNORECASE)
                 if match:
-                    if p_type is list:
+                    if p_type is list and inner_type is Pattern:
                         # Pega o Pattern.motivo correspondente ao regex do match
                         return patterns[match.lastindex - 1].motivo
-                    elif p_type is str:
-                        # Temos que retornar alguma coisa pois usamos o método [notna()] para fazer o boolean vector que será retornado por essa função.
+                    elif (p_type is str) or (p_type is list and inner_type is str):
+                        # Apenas [Pattern]'s tem motivo, no entanto temos que retornar alguma coisa, já que vamos usar  o método [notna()] para fazer o boolean vector que será retornado por essa função.
                         return patterns
 
         # | Cria um df contendo o motivo das publicações que entraram e None nas que não entraram
         motivos: Series = col.apply(_match_motivos)
 
         # | Adiciona os motivos
-        if p_type is not str:  # strings não tem motivo
+        if (p_type is list) and (inner_type is Pattern):  # Só [Pattern] tem motivo
             tmp = self._df
 
             def _junta_motivo(antigo, novo):

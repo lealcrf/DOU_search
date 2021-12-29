@@ -32,8 +32,28 @@ class FiltragemPorEmenta(Filtro):
                     Pattern("Lei nº 8.429"),  # R2A11
                     Pattern("Lei nº 14.133"),  # R2A11
                     Pattern("Programa de Estímulo ao Crédito"),  # R2Extra
+                    Pattern("entidades da administração pública federal"),  #!Temporário
                 ],
             )
+        )
+
+    def na_secao_1(self):
+        return self.query(
+            self.contains(
+                self._df.ementa,
+                [
+                    Pattern(
+                        "Poder Executivo federal",
+                        'Encontrou "Poder Executivo federal" na ementa em "Atos do Poder Executivo" no DO1',
+                    ),  # R3A2
+                    Pattern(
+                        "administração pública federal direta e indireta",
+                        'Encontrou "administração pública federal direta e indireta" na ementa em  "Atos do Poder Executivo" no DO1',
+                    ),  # R3A3
+                ],
+            )
+            & self.contains(self._df.secao, "DO1")
+            & self.contains(self._df.escopo, "Atos do Poder Executivo")
         )
 
     def menciona_bc_no_conteudo(self):

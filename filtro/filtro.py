@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import re
 from typing import List
 import pandas as pd
@@ -11,7 +12,7 @@ from teste import Pattern
 class Filtro:
     def __init__(self, df: DataFrame):
         self._df: pd.DataFrame = df.copy()
-        self._df["motivo"] = None
+        # self._df["motivo"] = None
         self._df.assinatura = self._df.assinatura.apply(tirar_acentuacao)
 
     def __call__(self) -> pd.DataFrame:
@@ -38,12 +39,14 @@ class Filtro:
         - Se [patterns] for str, nenhum motivo será adicionado
         """
         p_type = type(patterns)
-        inner_type = None if p_type is str else type(patterns[0])
+        try:
+            inner_type = str if type(patterns[0]) == str else Pattern
+        except:
+            inner_type = None
 
         # | Cria o regex a partir das/do [[patterns]]
         # Se [patters] for list[Pattern]
         if (p_type is list) and (inner_type is Pattern):
-
             # Substitui o motivo dos Patterns que tem motivo vazio por um motivo generico
             for p in patterns:
                 p.motivo = p.completar_motivo(col.name)
@@ -67,7 +70,7 @@ class Filtro:
             if item:
                 match = re.search(regex, item, flags=re.IGNORECASE)
                 if match:
-                    if p_type is list and inner_type is Pattern:
+                    if (p_type is list) and (inner_type is Pattern):
                         # Pega o Pattern.motivo correspondente ao regex do match
                         return patterns[match.lastindex - 1].motivo
                     elif (p_type is str) or (p_type is list and inner_type is str):
@@ -107,3 +110,21 @@ class Filtro:
 
         # Retorna apenas o que foi achado pela pesquisa
         return res_df
+
+@dataclass
+class Pattern:
+    regex: str
+    motivo: str = None
+
+    def completar_motivo(self, coluna):
+        motivo = "• " + (
+            self.motivo if self.motivo else self.criar_motivo_generico(coluna)
+        )
+        padrao_estipulado = "{}[{}]".format(coluna, self.regex)
+        return motivo + " => " + padrao_estipulado
+
+    def criar_motivo_generico(self, coluna):
+        if coluna in ["assinatura", "ementa"]:
+            return 'Achou "{}" na {}'.format(self.regex, coluna)
+
+        return 'Achou "{}" no {}'.format(self.regex, coluna)

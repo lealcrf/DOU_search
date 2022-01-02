@@ -1,15 +1,12 @@
-from numpy import NaN
 import pandas as pd
 from pandas.core.frame import DataFrame
-from pandas.core.series import Series
-from filtro.categorias.por_assinatura import FiltragemPorAssinatura
-from filtro.categorias.por_conteudo import FiltragemPorConteudo
-
-from filtro.categorias.por_ementa import FiltragemPorEmenta
-from filtro.categorias.por_escopo import FiltragemPorEscopo
-from filtro.categorias.por_motivo_geral import FiltragemPorMotivoGeral
-from filtro.categorias.por_titulo import FiltragemPorTitulo
-from repository import get_link_da_publicacao_ingov
+from .filtro.categorias.por_assinatura import FiltragemPorAssinatura
+from .filtro.categorias.por_conteudo import FiltragemPorConteudo
+from .filtro.categorias.por_ementa import FiltragemPorEmenta
+from .filtro.categorias.por_escopo import FiltragemPorEscopo
+from .filtro.categorias.por_motivo_geral import FiltragemPorMotivoGeral
+from .filtro.categorias.por_titulo import FiltragemPorTitulo
+from .infrastructure.repository import pegar_url_do_ingov
 
 
 class DOU:
@@ -43,7 +40,7 @@ class DOU:
     def gerar_sumula(self, com_link_ingov=False) -> pd.DataFrame:
         resultado = pd.concat(
             [
-                # self.filtrar_por_motivo_geral(),
+                # # self.filtrar_por_motivo_geral(),
                 self.filtrar_por_titulo(),
                 self.filtrar_por_escopo(),
                 self.filtrar_por_ementa(),
@@ -51,8 +48,8 @@ class DOU:
                 self.filtrar_por_assinatura(),
             ]
         )
-        
-        # Adiciona motivo se a publicação foi achada por mais de uma categoria de filtragem
+
+        # | Adiciona motivo se a publicação foi achada por mais de uma categoria de filtragem
         duplicados = resultado[resultado.duplicated("id", keep=False)]
         sumula = resultado.drop_duplicates(subset="id")
 
@@ -64,10 +61,8 @@ class DOU:
 
             sumula.loc[index].motivo = motivos
 
-        # Adiciona o link para o in.gov
+        # | Adiciona o link para o in.gov
         if com_link_ingov:
-            sumula["pdf"] = sumula.id_materia.apply(
-                lambda x: get_link_da_publicacao_ingov(x)
-            )
+            sumula["pdf"] = sumula.id_materia.apply(lambda x: pegar_url_do_ingov(x))
 
         return sumula

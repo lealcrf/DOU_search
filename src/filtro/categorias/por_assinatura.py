@@ -1,5 +1,5 @@
-from ..filtro import Filtro
-from teste import Pattern
+from ..filtro import Filtro, Pattern
+# from teste import Pattern
 
 
 class FiltragemPorAssinatura(Filtro):
@@ -7,7 +7,7 @@ class FiltragemPorAssinatura(Filtro):
         return self.query(
             (self.contains(self._df.assinatura, "RICARDO LIÁO"))  # A28
             & (self._df.tipo_normativo == "Portaria")  # A28
-            & (self.contains(self._df.secao, "DO1"))  # R2A1
+            # & (self.contains(self._df.secao, "DO1"))  # R2A1
         ).assign(motivo="Portaria assinada pelo pelo presidente do COAF")
 
     def presidente_e_diretores_do_BC(self):
@@ -24,7 +24,7 @@ class FiltragemPorAssinatura(Filtro):
                         "Assinatura de um diretor do BC",
                     ),
                     Pattern(
-                        "Paulo sérgio Neves Souza",
+                        "Paulo sérgio Neves de Souza",
                         "Assinatura de um diretor do BC",
                     ),
                     Pattern(

@@ -1,5 +1,4 @@
-from ..filtro import Filtro
-from teste import Pattern
+from ..filtro import Filtro, Pattern
 
 
 class FiltragemPorEmenta(Filtro):
@@ -32,7 +31,9 @@ class FiltragemPorEmenta(Filtro):
                     Pattern("Lei nº 8.429"),  # R2A11
                     Pattern("Lei nº 14.133"),  # R2A11
                     Pattern("Programa de Estímulo ao Crédito"),  # R2Extra
-                    Pattern("entidades da administração pública federal"),  #!Temporário
+                    Pattern("entidades da administração pública federal"),  #! #TODO Temporário
+                    Pattern("Banco Central do Brasil"), # ! #TODO temporário,
+                    
                 ],
             )
         )
@@ -72,5 +73,5 @@ class FiltragemPorEmenta(Filtro):
             & self.contains(self._df.escopo, "Ministério da Economia")
             & (self._df.tipo_normativo == "Instrução Normativa")  # A4,
         ).assign(
-            motivo="'Administração Pública federal direta, autárquica e fundacional' na ementa de Instruções Normativas do Ministério da Economia"
+            motivo='• "Administração Pública federal direta, autárquica e fundacional" na ementa de Instruções Normativas do Ministério da Economia'
         )

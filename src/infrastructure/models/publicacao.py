@@ -57,7 +57,6 @@ class Publicacao:
             "url": self.pdf,
             "ementa": self.ementa,
             "escopo": self.escopo,
-            # API do teams precisa que o " seja escapado. Já que, por exemplo, no payload ele vai fazer tipo assim:
-            # "text": "A publicação contem "lorem ipsilum" em x". aspas se cancelam
-            "motivo": self.motivo.replace('"', r"\""),  
+            # O • só é pra deixar mais fácil minha vida no jupyter, na súmula fica feio
+            "motivos": self.motivo.replace("• ", "").replace('"', r"\"").splitlines(),
         }

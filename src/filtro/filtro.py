@@ -5,21 +5,38 @@ import pandas as pd
 from pandas.core.arrays.boolean import BooleanArray
 from pandas.core.frame import DataFrame
 from pandas.core.series import Series
-from utils import tirar_acentuacao
-from teste import Pattern
+from src.utils import tirar_acentuacao
+
+
+@dataclass
+class Pattern:
+    regex: str
+    motivo: str = None
+
+    def completar_motivo(self, coluna):
+        motivo = "• " + (
+            self.motivo if self.motivo else self.criar_motivo_generico(coluna)
+        )
+        padrao_estipulado = "{}[{}]".format(coluna, self.regex)
+        return motivo + " => " + padrao_estipulado
+
+    def criar_motivo_generico(self, coluna):
+        if coluna in ["assinatura", "ementa"]:
+            return 'Achou "{}" na {}'.format(self.regex, coluna)
+
+        return 'Achou "{}" no {}'.format(self.regex, coluna)
 
 
 class Filtro:
     def __init__(self, df: DataFrame):
         self._df: pd.DataFrame = df.copy()
-        # self._df["motivo"] = None
         self._df.assinatura = self._df.assinatura.apply(tirar_acentuacao)
 
     def __call__(self) -> pd.DataFrame:
         """Executa todas as funções da classe, junta os resultados e os devolve como um DataFrame"""
         results = []
         for name in dir(self):
-            if name[:2] != "__" and name:
+            if name[0] != "_" and name:
                 obj = getattr(self, name)
 
                 if callable(obj) and name not in [
@@ -70,9 +87,12 @@ class Filtro:
             if item:
                 match = re.search(regex, item, flags=re.IGNORECASE)
                 if match:
+                    # Se for list[Pattern]
                     if (p_type is list) and (inner_type is Pattern):
                         # Pega o Pattern.motivo correspondente ao regex do match
                         return patterns[match.lastindex - 1].motivo
+
+                    # Se for str ou list[str]
                     elif (p_type is str) or (p_type is list and inner_type is str):
                         # Apenas [Pattern]'s tem motivo, no entanto temos que retornar alguma coisa, já que vamos usar  o método [notna()] para fazer o boolean vector que será retornado por essa função.
                         return patterns
@@ -82,49 +102,30 @@ class Filtro:
 
         # | Adiciona os motivos
         if (p_type is list) and (inner_type is Pattern):  # Só [Pattern] tem motivo
-            tmp = self._df
-
-            def _junta_motivo(antigo, novo):
-                # Caso esse for o primeiro motivo no item
-                if antigo is None and type(novo) is str:
-                    return novo
-
-                # Caso tenha mais motivos no item
-                if antigo is str and type(novo) is str:
-                    return antigo + "\n" + novo
-
-            self._df.motivo = tmp.motivo.combine(motivos, _junta_motivo)
+            # tmp = self._df
+            self._df.motivo = self._df.motivo.combine(motivos, self._add_new_motivo)
 
         # | Retorna um boolean array que diz quais são os items que passaram no filtro
         return motivos.notna()
+
+    def _add_new_motivo(self, antigo, novo):
+        # Caso esse for o primeiro motivo no item
+        if antigo is None and type(novo) is str:
+            return novo
+
+        # Caso tenha mais motivos no item
+        if antigo is str and type(novo) is str:
+            return antigo + "\n" + novo
 
     def query(self, condicoes: BooleanArray, motivo=None) -> pd.DataFrame:
         res_df = self._df[condicoes]
 
         # Caso ele queira apenas 1 motivo para toda query
         if motivo:
-            res_df.motivo = motivo
+            res_df.motivo = res_df.motivo.combine(motivo, self._add_new_motivo)
 
-        # Coloca essas mudanças no dataframe para
+        # Coloca essas mudanças no dataframe original
         self._df.update(res_df)
 
         # Retorna apenas o que foi achado pela pesquisa
         return res_df
-
-@dataclass
-class Pattern:
-    regex: str
-    motivo: str = None
-
-    def completar_motivo(self, coluna):
-        motivo = "• " + (
-            self.motivo if self.motivo else self.criar_motivo_generico(coluna)
-        )
-        padrao_estipulado = "{}[{}]".format(coluna, self.regex)
-        return motivo + " => " + padrao_estipulado
-
-    def criar_motivo_generico(self, coluna):
-        if coluna in ["assinatura", "ementa"]:
-            return 'Achou "{}" na {}'.format(self.regex, coluna)
-
-        return 'Achou "{}" no {}'.format(self.regex, coluna)

@@ -1,5 +1,4 @@
-from ..filtro import Filtro
-from teste import Pattern
+from ..filtro import Filtro, Pattern
 
 
 class FiltragemPorMotivoGeral(Filtro):

@@ -1,67 +1,59 @@
+from datetime import date
 import mysql.connector
-from mysql.connector import cursor
 import pandas as pd
 from pandas.core.frame import DataFrame
 from .models.publicacao import Publicacao
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+import config
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from azure.cosmos import CosmosClient
+import concurrent.futures
 
 
-try:
-    # Firestore
-    # firebase_admin.initialize_app(
-    #     credential=credentials.Certificate("cred.json"),
-    #     options={"projectId": "sumula-dou"},
-    # )
-    # db = firestore.client()
+def pegar_publicacoes_do_DOU_DB_LOCAL(do_dia: date = None) -> DataFrame:
+    """Pega publicacoes do banco de dados onde guardamos todas as DOU's"""
 
-    # MySQL local
     conn = mysql.connector.connect(
-        host="127.0.0.1",
-        user="matheus",
-        password="oasuet10",
-        database="test",
+        host="127.0.0.1", user="matheus", password="oasuet10", database="test"
     )
     cursor = conn.cursor()
 
-    ja_inicializou = True
-except:
-    pass
-
-
-def pegar_publicacoes_do_DOU_DB(n_ultimas_publicacoes: int = None) -> DataFrame:
-    """Pega publicacoes do banco de dados onde guardamos todas as DOU's
-
-    ## Parametros
-    
-    n_ultimas_publicacoes: pega as n publicações mais recentes
-    """
-
-    sql = "SELECT * FROM publicacoes {}".format(
-        f"ORDER BY data DESC LIMIT {n_ultimas_publicacoes}"
-        if n_ultimas_publicacoes
-        else ""
+    sql = "SELECT * FROM publicacoes" + (
+        f" WHERE data='{str(do_dia)}'" if do_dia else ""
     )
     cursor.execute(sql)
 
     df = pd.DataFrame(Publicacao(*pub) for pub in cursor.fetchall())
 
+    conn.close()
     return df
 
 
-def inserir_publicacoes_sumulaDB(df: DataFrame):
-    """Coloca as publicações na base de dados da súmula (firestore)"""
-    pass
+def inserir_publicacoes_dou_db(df: DataFrame):
+    """Coloca as publicações na database [dou] no (cosmosDB)"""
 
-    # pubs = [i.to_dict() for i in df.iloc]
+    client = CosmosClient(
+        url=config.cosmos["ACCOUNT_URI"],
+        credential=config.cosmos["ACCOUNT_KEY"],
+    )
+    db = client.get_database_client(config.cosmos["DATABASE_ID"])
+    container = db.get_container_client("dou")
 
-    # for pub in pubs:
-    #     pub.update({"data": str(pub["data"])})
-    #     db.collection(pub["data"]).document(pub["id_materia"]).set(pub)
+    def _upsert(pub):
+        pub.update({"data": str(pub["data"])})
+
+        try:
+            container.upsert_item(pub)
+        except:
+            pub.update({"conteudo": pub["conteudo"][0:1500]})
+            container.upsert_item(pub)
+
+    total = 0
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for _ in executor.map(_upsert, [i.to_dict() for i in df.iloc]):
+            total += 1
+            print(f"({total}/{len(df)}) = {round((total/len(df))*100, 2)}%")
 
 
 def pegar_url_do_ingov(id_materia: str) -> str:
@@ -84,4 +76,3 @@ def pegar_url_do_ingov(id_materia: str) -> str:
 
     driver.close()
     return link
-

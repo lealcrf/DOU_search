@@ -17,19 +17,11 @@ def enviar_sumula_para_o_teams(sumula: DataFrame):
         "escopos": [
             {
                 "escopo": escopo,
-                "publicacoes": [{"publicacao": "<pub>"} for _ in pubs],
+                "publicacoes": [{"publicacao": publicacao_to_card(pub)} for pub in pubs],
             }
             for escopo, pubs in secoes.items()
         ],
     }
-
-    for index_escopo, escopo in enumerate(secoes.keys()):
-        publicacoes = payload["escopos"][index_escopo]["publicacoes"]
-
-        for index_publicacao, item in enumerate(publicacoes):
-            publicacao = secoes[escopo][index_publicacao]
-
-            item["publicacao"] = publicacao_to_card(publicacao)
 
     requests.post(
         FLOW_ENDPOINT,

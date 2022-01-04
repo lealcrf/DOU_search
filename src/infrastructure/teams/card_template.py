@@ -57,7 +57,10 @@ def ementa(ementa):
 
 def row(motivos, n_row):
     index_motivo_inicial = n_row * 2
-    index_motivo_final = (2 * (n_row + 1)) - (len(motivos) % 2)
+    index_motivo_final = 2 * (n_row + 1)
+
+    if index_motivo_final > len(motivos):
+        index_motivo_final -= 1
 
     return {
         "type": "ColumnSet",
@@ -72,12 +75,10 @@ def row(motivos, n_row):
                         "text": motivos[index],
                         "wrap": True,
                     }
-                    for index in range(index_motivo_inicial, index_motivo_final)
                 ],
                 "style": "emphasis",
                 "spacing": "Small",
             }
+            for index in range(index_motivo_inicial, index_motivo_final)
         ],
     }
-
-

@@ -25,6 +25,20 @@ def publicacao_to_card(pub):
     )
 
 
+def sumula_vazia_card():
+    return "{}".format(
+        json.dumps(
+            {
+                "type": "AdaptiveCard",
+                "body": [ementa("O robô não achou nenhuma publicação hoje")],
+                "msteams": {"width": "Full"},
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.2",
+            }
+        ),
+    )
+
+
 def titulo(titulo, url):
     return {
         "type": "Container",
@@ -39,6 +53,7 @@ def titulo(titulo, url):
             }
         ],
         "style": "emphasis",
+        # "style": "Attention",
     }
 
 

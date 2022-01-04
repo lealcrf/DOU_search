@@ -31,9 +31,10 @@ class FiltragemPorEmenta(Filtro):
                     Pattern("Lei nº 8.429"),  # R2A11
                     Pattern("Lei nº 14.133"),  # R2A11
                     Pattern("Programa de Estímulo ao Crédito"),  # R2Extra
-                    Pattern("entidades da administração pública federal"),  #! #TODO Temporário
-                    Pattern("Banco Central do Brasil"), # ! #TODO temporário,
-                    
+                    Pattern(
+                        "entidades da administração pública federal"
+                    ),  #! #TODO Temporário
+                    Pattern("Banco Central"),
                 ],
             )
         )
@@ -45,7 +46,7 @@ class FiltragemPorEmenta(Filtro):
                 [
                     Pattern(
                         "Poder Executivo federal",
-                        'Encontrou "Poder Executivo federal" na ementa em "Atos do Poder Executivo" no DO1',
+                        'Publicação com escopo "Atos do Poder Executivo" ou "Ministério da Economia" da seção 1 que contenham "poder executivo federal" na ementa, excluindo as publicações da (SETO/ME) da Secretaria do Tesouro',
                     ),  # R3A2
                     Pattern(
                         "administração pública federal direta e indireta",
@@ -54,7 +55,12 @@ class FiltragemPorEmenta(Filtro):
                 ],
             )
             & self.contains(self._df.secao, "DO1")
-            & self.contains(self._df.escopo, "Atos do Poder Executivo")
+            & self.contains(
+                self._df.escopo,
+                [Pattern("Atos do Poder Executivo"), Pattern("Ministério da Economia")],
+            )
+            & (~self.contains(self._df.titulo, "SETO\s?/\s?ME")),
+            motivo='Publicações com escopo "Atos do Poder Executivo" e "Ministério da Economia" da seção 1 que contenham "poder executivo federal" ou "Administração Pública Federal Direta e Indireta" na ementa, excluindo as publicações da (SETO/ME) da Secretaria do Tesouro',
         )
 
     def menciona_bc_no_conteudo(self):

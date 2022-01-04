@@ -23,9 +23,17 @@ class FiltragemPorTitulo(Filtro):
                 [
                     Pattern("SUSEP"),
                     Pattern("PREVIC"),
-                    Pattern("CONAF"),
+                    Pattern("COAF"),
                 ],
             )
             & self.contains(self._df.ementa, "Banco Central"),  # R1
-            motivo="Publicação da SUSEP, PREVIC OU CONAF que menciona o Banco Central na emenda",
+            motivo="Publicação da SUSEP, PREVIC OU COAF que menciona o Banco Central na emenda",
+        )
+
+    def banco_central_no_conteudo(self):
+        return self.query(
+            self.contains(self._df.titulo, "PORTARIA SETO")
+            & self.contains(self._df.conteudo, "Banco Central"),
+            motivo='Publicações que contenham "PORTARIA SETO" no título e mencionem o Banco Central no conteúdo',
+            # Conversa com Carlos e Ligiane no dia 04/01/2022
         )

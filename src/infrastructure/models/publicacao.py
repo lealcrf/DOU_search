@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 import re
 
 
@@ -23,6 +23,24 @@ class Publicacao:
     pdf: str
     id_materia: str
     motivo: str = None
+
+    @staticmethod
+    def from_database(json):
+        return Publicacao(
+            id=json["id"],
+            secao=json["secao"],
+            tipo_normativo=json["tipo_normativo"],
+            data=datetime.strptime(json["data"], "%Y-%m-%d").date(),
+            escopo=json["escopo"],
+            titulo=json["titulo"],
+            ementa=json["ementa"],
+            conteudo=json["conteudo"],
+            assinatura=json["assinatura"],
+            pdf=json["pdf"],
+            id_materia=json["id_materia"],
+            motivo=json["motivo"],
+        )
+
 
     def to_sumula(self) -> dict:
         """Limpa a publicação para ser enviada à súmula"""

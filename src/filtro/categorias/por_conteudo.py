@@ -101,7 +101,8 @@ class FiltragemPorConteudo(Filtro):
                         "Despacho do Diretor de Administração",
                     ),  # A31",
                     Pattern(
-                        "PORTARIA.+O MINISTRO DE ESTADO DA ECONOMIA.+afastamento.+Banco Central",
+                        "^.{0,100}PORTARIA.+O MINISTRO DE ESTADO DA ECONOMIA.+afastamento.+Banco Central",
+                        # Já que o conteudo vem com o titulo junto, eu precisei dizer que o título (primeiros 100 caracteres) deve conter PORTARIA
                         "Portaria do Ministro da Economia afastando alguém do Banco Central",
                     ),  # A32",
                     Pattern(

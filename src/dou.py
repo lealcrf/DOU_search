@@ -13,14 +13,11 @@ from .filtro.categorias.por_titulo import FiltragemPorTitulo
 from .infrastructure.repository import pegar_url_do_ingov
 
 
-class DOU(Filtro):
+class DOU():
     def __init__(self, df: DataFrame):
         self.df = df
         self.df.assinatura = self.df.assinatura.apply(tirar_acentuacao)
-
-    def __call__(self) -> pd.DataFrame:
-        pass 
-
+    
     @property
     def filtrar_por_assinatura(self):
         return FiltragemPorAssinatura(self.df)

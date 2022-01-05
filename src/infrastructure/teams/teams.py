@@ -4,14 +4,16 @@ from ..models.publicacao import Publicacao
 import requests
 import json
 from .card_template import publicacao_to_card, sumula_vazia_card
-from config import FLOW_ENDPOINT, FLOW_ENDPOINT_TESTE
+from config import Endpoints
 
 
 class SumulaVaziaException(Exception):
     pass
 
 
-def enviar_sumula_para_o_teams(sumula: DataFrame, enviar_para_canal_de_testes=True):
+def enviar_sumula_para_o_teams(
+    sumula: DataFrame, endpoint: Endpoints = Endpoints.FLOW_ENDPOINT_TESTE
+):
     """Envia a súmula formatada como card para o canal do projeto no teams"""
     try:
         # | Se o robô não achar nenhuma publicação, ele vai enviar uma mensagem avisando o ocorrido
@@ -44,7 +46,7 @@ def enviar_sumula_para_o_teams(sumula: DataFrame, enviar_para_canal_de_testes=Tr
         }
 
     requests.post(
-        FLOW_ENDPOINT_TESTE if enviar_para_canal_de_testes else FLOW_ENDPOINT,
+        endpoint.value,
         data=json.dumps(payload),
         headers={"content-type": "application/json"},
     )
@@ -52,7 +54,7 @@ def enviar_sumula_para_o_teams(sumula: DataFrame, enviar_para_canal_de_testes=Tr
 
 def _limpar_e_ordenar_sumula_em_secoes(sumula: DataFrame) -> dict[str, list]:
     """Deixa as publicações em uma forma mais organizada e parecida com a súmula oficial
-    
+
     Na súmula oficial, as publicações são divididas em escopos (que aqui eu estou chamando de seções). Dentro de cada seção, as publicações são ordenadas em ordem alfabética, com o título formatado para mostrar apenas o necessário.
     """
     secoes = dict()

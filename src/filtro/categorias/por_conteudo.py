@@ -89,11 +89,11 @@ class FiltragemPorConteudo(Filtro):
                     ),  # R2-A9
                     # ******************************** Afastamentos ****************************************
                     Pattern(
-                        "(?:Exposição|Exposições) de Motivos.+Presidente do Banco Central do Brasil",
+                        "(?:Exposição|Exposições) de Motivos.{0,200}(?:afastamento|férias).{0,50} Presidente do Banco Central do Brasil",
                         "Afastamento do Presidente do BC",
                     ),  # A29",
                     Pattern(
-                        "(?:Exposição|Exposições) de Motivos.+Ministro de Estado da Economia",
+                        "(?:Exposição|Exposições) de Motivos.{0,200}(?:afastamento|férias).{0,50} Ministro de Estado da Economia",
                         "Afastamento do Ministro de Estado da Economia",
                     ),  # A30",
                     Pattern(

@@ -5,7 +5,7 @@ class FiltragemPorConteudo(Filtro):
     def frases_gerais(self):
         return self.query(
             self.contains(
-                self._df.conteudo,
+                self.df.conteudo,
                 [
                     Pattern("Comissão Técnica da Moeda e do Crédito"),  # A8
                     Pattern(
@@ -115,9 +115,9 @@ class FiltragemPorConteudo(Filtro):
     def da_subchefia_para_assuntos_juridicos(self):
         return self.query(
             self.contains(
-                self._df.conteudo,
+                self.df.conteudo,
                 "temas jurídicos relevantes para a administração pública",
             )
-            & self.contains(self._df.escopo, "Subchefia para Assuntos Jurídicos"),
+            & self.contains(self.df.escopo, "Subchefia para Assuntos Jurídicos"),
             motivo='• Publicação da Subchefia para Assuntos Jurídicos que contém "temas jurídicos relevantes para a administração pública" no conteúdo',
         )

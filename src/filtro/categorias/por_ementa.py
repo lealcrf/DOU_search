@@ -5,7 +5,7 @@ class FiltragemPorEmenta(Filtro):
     def frases_gerais(self):
         return self.query(
             condicoes=self.contains(
-                self._df.ementa,
+                self.df.ementa,
                 [
                     Pattern("Conselho de Controle de Atividades Financeiras"),  # A[123]
                     Pattern(
@@ -40,44 +40,56 @@ class FiltragemPorEmenta(Filtro):
         )
 
     def na_secao_1(self):
+        # TODO VER PORQUE O MEU FILTRO É TÃO LENTO, E VER SE TEM ALGUMA COISA QUE EU POSSO FAZER QUE SE PAREÇA COM ISSO
+        # return (
+        #     self._df.ementa.str.contains(
+        #         "(Poder Executivo Federal|administração pública federal direta e indireta)"
+        #     )
+        #     & self._df.secao.str.contains("DO1")
+        #     & self._df.escopo.str.contains(
+        #         "(Atos do Poder Executivo|Ministério da Economia)"
+        #     )
+        #     & (~self._df.titulo.str.contains("SETO\s?/\s?ME", na=False))
+        # )
+
         return self.query(
             self.contains(
-                self._df.ementa,
+                self.df.ementa,
                 [
                     Pattern(
-                        "Poder Executivo federal",
-                        'Publicação com escopo "Atos do Poder Executivo" ou "Ministério da Economia" da seção 1 que contenham "poder executivo federal" na ementa, excluindo as publicações da (SETO/ME) da Secretaria do Tesouro',
+                        "poder executivo federal",
+                        'Publicação com escopo "Atos do Poder Executivo" ou "Ministério da Economia" da seção 1 que contém "poder executivo federal" na ementa e não é SETO/ME  Secretaria do Tesouro',
                     ),  # R3A2
                     Pattern(
                         "administração pública federal direta e indireta",
-                        'Encontrou "administração pública federal direta e indireta" na ementa em  "Atos do Poder Executivo" no DO1',
+                        'Publicação com escopo "Atos do Poder Executivo" ou "Ministério da Economia" da seção 1 que contém "administração pública federal direta e indireta" na ementa e não é SETO/ME  Secretaria do Tesouro',
                     ),  # R3A3
                 ],
             )
-            & self.contains(self._df.secao, "DO1")
+            & self.contains(self.df.secao, "DO1")
             & self.contains(
-                self._df.escopo,
+                self.df.escopo,
                 [Pattern("Atos do Poder Executivo"), Pattern("Ministério da Economia")],
             )
-            & (~self.contains(self._df.titulo, "SETO\s?/\s?ME")),
+            & (~self.contains(self.df.titulo, "SETO\s?/\s?ME")),
             motivo='Publicações com escopo "Atos do Poder Executivo" e "Ministério da Economia" da seção 1 que contenham "poder executivo federal" ou "Administração Pública Federal Direta e Indireta" na ementa, excluindo as publicações da (SETO/ME) da Secretaria do Tesouro',
-        )
+        )  # https://teams.microsoft.com/l/message/19:1bfa966669b646c0a164a0731890fc03@thread.tacv2/1641231369273?tenantId=2a7030a7-3850-453e-96b7-cd5f58ba9ec2&groupId=b6ac4626-ee30-42ff-a204-c14fcbdb1313&parentMessageId=1641231369273&teamName=Projeto%20S%C3%BAmula%20DOU&channelName=Crit%C3%A9rios%20de%20busca&createdTime=1641231369273
 
     def menciona_bc_no_conteudo(self):
         return self.query(
-            self.contains(self._df.ementa, "Comitê Gestor da Segurança da Informação")
-            & self.contains(self._df.conteudo, "Banco Central"),
+            self.contains(self.df.ementa, "Comitê Gestor da Segurança da Informação")
+            & self.contains(self.df.conteudo, "Banco Central"),
             motivo="Comitê Gestor da Segurança da Informação na ementa e menciona o Banco Central no conteúdo",  # R2A10
         )
 
     def instrucao_normativa_misterio_da_economia_administracao_publica(self):
         return self.query(
             self.contains(
-                self._df.ementa,
+                self.df.ementa,
                 "Administração Pública federal direta, autárquica e fundacional",
             )
-            & self.contains(self._df.escopo, "Ministério da Economia")
-            & (self._df.tipo_normativo == "Instrução Normativa")  # A4,
+            & self.contains(self.df.escopo, "Ministério da Economia")
+            & (self.df.tipo_normativo == "Instrução Normativa")  # A4,
         ).assign(
             motivo='• "Administração Pública federal direta, autárquica e fundacional" na ementa de Instruções Normativas do Ministério da Economia'
         )

@@ -29,8 +29,7 @@ class Pattern:
 
 class Filtro:
     def __init__(self, df: DataFrame):
-        self._df: pd.DataFrame = df.copy()
-        self._df.assinatura = self._df.assinatura.apply(tirar_acentuacao)
+        self.df: pd.DataFrame = df.copy()
 
     def __call__(self) -> pd.DataFrame:
         """Executa todas as funções da classe, junta os resultados e os devolve como um DataFrame"""
@@ -47,9 +46,8 @@ class Filtro:
 
         return pd.concat(results)
 
-    def contains(
-        self, col: Series, patterns: List[Pattern] | str | List[str]
-    ) -> BooleanArray:
+    def contains(self, col: Series, patterns: List[Pattern]) -> BooleanArray:
+        # def contains(self, col: Series, patterns: List[Pattern] | str | List[str]) -> BooleanArray:
         """Procura na coluna os items que satisfaçam algum dos padrões
 
         - Se [patterns] for List[Pattern], vai adicionar o motivo contido em pattern.motivo na sumula
@@ -103,7 +101,8 @@ class Filtro:
         # | Adiciona os motivos
         if (p_type is list) and (inner_type is Pattern):  # Só [Pattern] tem motivo
             # tmp = self._df
-            self._df.motivo = self._df.motivo.combine(motivos, self._add_new_motivo)
+            self.df.motivo = self.df.motivo.combine(motivos, self._add_new_motivo)
+
 
         # | Retorna um boolean array que diz quais são os items que passaram no filtro
         return motivos.notna()
@@ -118,14 +117,14 @@ class Filtro:
             return antigo + "\n" + novo
 
     def query(self, condicoes: BooleanArray, motivo=None) -> pd.DataFrame:
-        res_df = self._df[condicoes]
+        res_df = self.df[condicoes]
 
         # Caso ele queira apenas 1 motivo para toda query
         if motivo:
             res_df.motivo = res_df.motivo.combine(motivo, self._add_new_motivo)
 
         # Coloca essas mudanças no dataframe original
-        self._df.update(res_df)
+        self.df.update(res_df)
 
         # Retorna apenas o que foi achado pela pesquisa
         return res_df

@@ -1,4 +1,5 @@
+azure-cosmos
 mysql-connector-python
 pandas
-firebase_admin
-selenium
+regex
+python-dotenv

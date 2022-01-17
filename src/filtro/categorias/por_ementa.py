@@ -26,7 +26,7 @@ class FiltragemPorEmenta(Filtro):
                         "Subdelega competências para a prática de atos de gestão de pessoas no âmbito do Ministério da Economia às autoridades que menciona"
                     ),  # R2A7
                     Pattern(
-                        "Sistema de Pessoal Civil da Administração Federal"
+                        "(?:Sistema de Pessoal Civil da Administração (?:Pública)? Federal|SIPEC)"
                     ),  # R2A8
                     Pattern("Lei nº 8.429"),  # R2A11
                     Pattern("Lei nº 14.133"),  # R2A11

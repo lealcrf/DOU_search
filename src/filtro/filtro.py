@@ -5,7 +5,7 @@ import pandas as pd
 from pandas.core.arrays.boolean import BooleanArray
 from pandas.core.frame import DataFrame
 from pandas.core.series import Series
-from src.utils import tirar_acentuacao
+from ..utils import tirar_acentuacao
 
 
 @dataclass

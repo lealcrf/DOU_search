@@ -1,36 +1,33 @@
-from datetime import date
+import os
 import pandas as pd
 from pandas.core.frame import DataFrame
-from .models.publicacao import Publicacao
-import config
+from ..models.publicacao import Publicacao
 from azure.cosmos import CosmosClient
 import concurrent.futures
-from datetime import timedelta
 import requests
+from ..utils import DateRange
 
-
-
-def pegar_publicacoes_dou_db_remote(do_dia: date, incluir_n_dias_passados: int = 0):
+def pegar_publicacoes_dou_db_remote(date_range: DateRange = None) -> DataFrame:
 
     client = CosmosClient(
-        url=config.cosmos["ACCOUNT_URI"],
-        credential=config.cosmos["ACCOUNT_KEY"],
+        url=os.getenv("COSMOS_ACCOUNT_URI"),
+        credential=os.getenv("COSMOS_ACCOUNT_KEY"),
     )
 
-    db = client.get_database_client(config.cosmos["DATABASE_ID"])
+    db = client.get_database_client(os.getenv("COSMOS_DATABASE_ID"))
     container = db.get_container_client("dou")
 
-    data_inicial = str(do_dia - timedelta(days=incluir_n_dias_passados))
-    data_final = str(do_dia)
-
-    sql = f"SELECT * FROM c WHERE c.data BETWEEN '{data_inicial}' AND '{data_final}'"
+    if date_range:
+        sql = f"SELECT * FROM c WHERE c.data BETWEEN '{date_range.inicio}' AND '{date_range.fim}'"
+    else:
+        sql = f"SELECT * FROM c"
 
     pubs = [
         Publicacao.from_database(json)
         for json in list(container.query_items(sql, enable_cross_partition_query=True))
     ]
 
-    return pd.DataFrame(pubs)
+    return pd.DataFrame(pubs, columns=Publicacao.get_fields())
 
 
 # def inserir_publicacoes_dou_db(df: DataFrame):
@@ -66,6 +63,6 @@ def pegar_urls_do_ingov(ids: pd.Series) -> str:
         "https://nfk08v8za2.execute-api.sa-east-1.amazonaws.com/default/ingov_scraper",
         json={"ids": ids.tolist()},
     ).json()
-    
+
     links = res["body"]
     return links

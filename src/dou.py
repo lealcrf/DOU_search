@@ -1,21 +1,33 @@
-from datetime import date
 import pandas as pd
-from pandas.core.frame import DataFrame
-
-from .utils import tirar_acentuacao
+from .utils import DateRange, tirar_acentuacao
 from .filtro.categorias.por_assinatura import FiltragemPorAssinatura
 from .filtro.categorias.por_conteudo import FiltragemPorConteudo
 from .filtro.categorias.por_ementa import FiltragemPorEmenta
 from .filtro.categorias.por_escopo import FiltragemPorEscopo
 from .filtro.categorias.por_titulo import FiltragemPorTitulo
-from .infrastructure.repository import pegar_url_do_ingov
+from .infrastructure.repository import (
+    pegar_urls_do_ingov,
+    pegar_publicacoes_dou_db_remote,
+)
+from .models.publicacao import Publicacao
 
 
-class DOU():
-    def __init__(self, df: DataFrame):
-        self.df = df
-        self.df.assinatura = self.df.assinatura.apply(tirar_acentuacao)
-    
+class DOU:
+    def __init__(self, date_range: DateRange = None, is_remote_db=False, df=None):
+        if df is not None:
+            self.df = df
+        elif is_remote_db:
+            self.df = pegar_publicacoes_dou_db_remote(date_range)
+        else:
+            try:
+                from .infrastructure.local_db import pegar_publicacoes_dou_db_local
+                self.df = pegar_publicacoes_dou_db_local(date_range)
+            except ModuleNotFoundError:
+                pass
+        
+        if not self.df.empty:
+            self.df.assinatura = self.df.assinatura.apply(tirar_acentuacao)
+
     @property
     def filtrar_por_assinatura(self):
         return FiltragemPorAssinatura(self.df)
@@ -36,7 +48,7 @@ class DOU():
     def filtrar_por_titulo(self):
         return FiltragemPorTitulo(self.df)
 
-    def gerar_sumula(self, com_link_ingov=False) -> pd.DataFrame:
+    def gerar_sumula(self, com_link_ingov=False, versao_oficial=False) -> pd.DataFrame:
         resultado = pd.concat(
             [
                 self.filtrar_por_titulo(),
@@ -61,6 +73,22 @@ class DOU():
 
         # | Adiciona o link para o in.gov
         if com_link_ingov:
-            sumula["pdf"] = sumula.id_materia.apply(lambda x: pegar_url_do_ingov(x))
+            sumula["pdf"] = pegar_urls_do_ingov(ids=sumula.id_materia)
+
+        if versao_oficial:  
+            # | Organiza as publicações de modo a se assemelhar à súmula oficial
+
+            # Divide as publicações por escopo (i.e. seções)
+            secoes = dict()
+            for pub in sumula.transpose().to_dict().values():
+                pub = Publicacao(**pub).to_sumula()
+                secoes.setdefault(pub["escopo"], []).append(pub)
+
+            # Coloca as publicações de cada escopo em ordem alfabética
+            for escopo, pubs in secoes.items():
+                secoes[escopo] = sorted(pubs, key=lambda pub: pub["titulo"])
+
+            # Retorna um dict[secao, list[publicações]] 
+            return secoes
 
         return sumula

@@ -1,10 +1,10 @@
-from datetime import date
 import mysql.connector
 import pandas as pd
+from ..utils import DateRange
+from ..models.publicacao import Publicacao
 
-from .models.publicacao import Publicacao
 
-def pegar_publicacoes_dou_db_local(do_dia: date = None) -> pd.DataFrame:
+def pegar_publicacoes_dou_db_local(date_range: DateRange = None) -> pd.DataFrame:
     """Pega publicacoes do banco de dados onde guardamos todas as DOU's"""
 
     conn = mysql.connector.connect(
@@ -12,13 +12,17 @@ def pegar_publicacoes_dou_db_local(do_dia: date = None) -> pd.DataFrame:
     )
     cursor = conn.cursor()
 
-    sql = "SELECT * FROM publicacoes" + (
-        f" WHERE data='{str(do_dia)}'" if do_dia else ""
-    )
+    if date_range:
+        sql = f"SELECT * FROM publicacoes WHERE data BETWEEN'{date_range.inicio}' AND '{date_range.fim}'"
+    else:
+        sql = "SELECT * FROM publicacoes"
 
     cursor.execute(sql)
 
-    df = pd.DataFrame(Publicacao(*pub) for pub in cursor.fetchall())
+    df = pd.DataFrame(
+        [Publicacao(*pub) for pub in cursor.fetchall()],
+        columns=Publicacao.get_fields(),
+    )
 
     conn.close()
     return df

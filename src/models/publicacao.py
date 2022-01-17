@@ -38,15 +38,18 @@ class Publicacao:
             assinatura=json["assinatura"],
             pdf=json["pdf"],
             id_materia=json["id_materia"],
-            motivo=json["motivo"],
+            motivo=None,
         )
-
+    
+    @staticmethod
+    def get_fields():
+        return list(Publicacao.__annotations__.keys())
 
     def to_sumula(self) -> dict:
         """Limpa a publicação para ser enviada à súmula"""
 
         # | Tira o excesso do titulo
-        self.titulo = re.sub(r",? DE .+2021?", "", self.titulo.upper())
+        self.titulo = re.sub(r",? DE .+202\d?", "", self.titulo.upper())
 
         escopos_importantes = [
             "Banco Central do Brasil",

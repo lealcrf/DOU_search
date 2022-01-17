@@ -1,24 +1,34 @@
 from datetime import date
-from pandas import DataFrame
 import requests
-import json
 from .card_template import publicacao_to_card, sumula_vazia_card
-from .utils import Endpoints, SumulaVazia, limpar_e_ordenar_sumula_em_secoes
+import os
+from enum import Enum
+
+class SumulaVazia(Exception):
+    pass
+
+
+class Endpoints(Enum):
+    """Endpoints que são usados para se conectar com a api do teams"""
+
+    AREA_DE_TESTE = os.getenv("TEAMS_API_ENDPOINT_TESTE")
+    OFICIAL = os.getenv("TEAMS_API_ENDPOINT")
+    LIGIANE = os.getenv("TEAMS_API_ENDPOINT_LIGIANE")
 
 
 def enviar_sumula_para_o_teams(
-    sumula: DataFrame, api_endpoint: Endpoints = Endpoints.TESTE
+    sumula: dict,
+    dia: date,
+    api_endpoint: Endpoints = Endpoints.AREA_DE_TESTE,
 ):
-    """Envia a súmula formatada como card para o canal do projeto no teams"""
+    """Envia a súmula em fortado de cards para o canal do projeto no teams"""
     try:
         # | Se o robô não achar nenhuma publicação, ele vai enviar uma mensagem avisando o ocorrido
-        if sumula.empty:
+        if len(sumula) == 0:
             raise SumulaVazia()
 
-        secoes = limpar_e_ordenar_sumula_em_secoes(sumula)
-
         payload = {
-            "cabecalho": f"Publicações do dia {sumula.iloc[0].data.strftime('%d/%m/%Y')}",
+            "cabecalho": "Publicações do dia " + dia.strftime("%d/%m/%Y"),
             "escopos": [
                 {
                     "escopo": escopo,
@@ -26,12 +36,12 @@ def enviar_sumula_para_o_teams(
                         {"publicacao": publicacao_to_card(pub)} for pub in pubs
                     ],
                 }
-                for escopo, pubs in secoes.items()
+                for escopo, pubs in sumula.items()
             ],
         }
     except SumulaVazia:
         payload = {
-            "cabecalho": f"Publicações do dia {date.today().strftime('%d/%m/%Y')}",
+            "cabecalho": f"Publicações do dia " + dia.strftime("%d/%m/%Y"),
             "escopos": [
                 {
                     "escopo": "",
@@ -40,8 +50,4 @@ def enviar_sumula_para_o_teams(
             ],
         }
 
-    requests.post(
-        api_endpoint.value,
-        data=json.dumps(payload),
-        headers={"content-type": "application/json"},
-    )
+    requests.post(api_endpoint.value, json=payload)

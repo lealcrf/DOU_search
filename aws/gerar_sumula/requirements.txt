@@ -1,0 +1,4 @@
+azure-cosmos
+pandas
+regex
+python-dotenv

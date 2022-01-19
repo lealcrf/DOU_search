@@ -1,6 +1,4 @@
 from ..filtro import Filtro, Pattern
-# from teste import Pattern
-
 
 class FiltragemPorAssinatura(Filtro):
     def assinadas_pelo_presidente_do_COAF(self):

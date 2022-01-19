@@ -74,6 +74,7 @@ class Publicacao:
 
         # | Retorna só as partes que importam para a súmula
         return {
+            "id": self.id_materia,
             "titulo": self.titulo,
             "url": self.pdf,
             "ementa": self.ementa,

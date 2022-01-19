@@ -26,13 +26,11 @@ class Pattern:
 
         return 'Achou "{}" no {}'.format(self.regex, coluna)
 
-
 class Filtro:
     def __init__(self, df: DataFrame):
         self.df: pd.DataFrame = df.copy()
-
-    def __call__(self) -> pd.DataFrame:
-        """Executa todas as funções da classe, junta os resultados e os devolve como um DataFrame"""
+    
+    def aplicar_todos(self):
         results = []
         for name in dir(self):
             if name[0] != "_" and name:
@@ -41,10 +39,12 @@ class Filtro:
                 if callable(obj) and name not in [
                     self.contains.__name__,
                     self.query.__name__,
+                    self.aplicar_todos.__name__,
                 ]:
                     results.append(obj())
 
         return pd.concat(results)
+        
 
     def contains(self, col: Series, patterns: List[Pattern]) -> BooleanArray:
         # def contains(self, col: Series, patterns: List[Pattern] | str | List[str]) -> BooleanArray:

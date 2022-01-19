@@ -19,11 +19,11 @@ def query_dou_remote(sql: str):
     return list(container.query_items(sql, enable_cross_partition_query=True))
 
 
-def pegar_dou_remote_db(date_range: DateRange):    
+def pegar_dou_remote_db(date_range: DateRange):
     sql = f"SELECT * FROM c WHERE c.data BETWEEN '{date_range.inicio}' AND '{date_range.fim}'"
 
     pubs = [Publicacao.from_database(json) for json in query_dou_remote(sql)]
-    
+
     return pd.DataFrame(pubs, columns=Publicacao.get_fields())
 
 
@@ -51,16 +51,3 @@ def pegar_dou_remote_db(date_range: DateRange):
 #         for _ in executor.map(_upsert, [i.to_dict() for i in df.iloc]):
 #             total += 1
 #             print(f"({total}/{len(df)}) = {round((total/len(df))*100, 2)}%")
-
-
-def pegar_urls_do_ingov(ids: pd.Series) -> str:
-    """Faz um scrape para achar o link da do site in.gov baseado no id da matéria"""
-
-    res = requests.get(
-        "https://nfk08v8za2.execute-api.sa-east-1.amazonaws.com/default/ingov_scraper",
-        json={"ids": ids.tolist()},
-    ).json()        
-    
-    links = res["body"]
-    
-    return  links

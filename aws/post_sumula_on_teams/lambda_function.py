@@ -2,7 +2,10 @@ from  datetime import date
 from src.infrastructure.teams.teams import Endpoints, enviar_sumula_para_o_teams
 
 def lambda_handler(event, context):
+    
     sumula = event["body"]
+    if (event["status"] == "VAZIO"):
+        sumula = {}
 
     enviar_sumula_para_o_teams(
         sumula,

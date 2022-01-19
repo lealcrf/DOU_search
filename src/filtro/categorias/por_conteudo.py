@@ -109,6 +109,10 @@ class FiltragemPorConteudo(Filtro):
                         "Despacho do Presidente do Banco Central do Brasil.+Presidente do COAF",
                         "Afastamento do presidente do COAF",
                     ),  # Sempre que o presidente do COAF se ausenta, o Presidente do Banco Central do Brasil precisa fazer um despacho",
+                    Pattern(
+                        "Ministros? de Estado.*Decreto nº 71.733|Decreto nº 71.733.*Ministros? de Estado",
+                        '"Ministro de Estado" e "Decreto 71.733" concomitantemente na ementa ou no texto',
+                    ),#T2022-1-19
                 ],
             )
         )

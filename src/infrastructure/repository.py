@@ -7,8 +7,8 @@ import concurrent.futures
 import requests
 from ..utils import DateRange
 
-def pegar_publicacoes_dou_db_remote(date_range: DateRange = None) -> DataFrame:
 
+def query_dou_remote(sql: str):
     client = CosmosClient(
         url=os.getenv("COSMOS_ACCOUNT_URI"),
         credential=os.getenv("COSMOS_ACCOUNT_KEY"),
@@ -16,17 +16,14 @@ def pegar_publicacoes_dou_db_remote(date_range: DateRange = None) -> DataFrame:
 
     db = client.get_database_client(os.getenv("COSMOS_DATABASE_ID"))
     container = db.get_container_client("dou")
+    return list(container.query_items(sql, enable_cross_partition_query=True))
 
-    if date_range:
-        sql = f"SELECT * FROM c WHERE c.data BETWEEN '{date_range.inicio}' AND '{date_range.fim}'"
-    else:
-        sql = f"SELECT * FROM c"
 
-    pubs = [
-        Publicacao.from_database(json)
-        for json in list(container.query_items(sql, enable_cross_partition_query=True))
-    ]
+def pegar_dou_remote_db(date_range: DateRange):    
+    sql = f"SELECT * FROM c WHERE c.data BETWEEN '{date_range.inicio}' AND '{date_range.fim}'"
 
+    pubs = [Publicacao.from_database(json) for json in query_dou_remote(sql)]
+    
     return pd.DataFrame(pubs, columns=Publicacao.get_fields())
 
 
@@ -62,7 +59,8 @@ def pegar_urls_do_ingov(ids: pd.Series) -> str:
     res = requests.get(
         "https://nfk08v8za2.execute-api.sa-east-1.amazonaws.com/default/ingov_scraper",
         json={"ids": ids.tolist()},
-    ).json()
-
+    ).json()        
+    
     links = res["body"]
-    return links
+    
+    return  links

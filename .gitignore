@@ -1,9 +1,13 @@
 zz.txt
+yy.txt
 testes.ipynb
 testes.py
 aws/*/*.zip
 .vscode
- 
+*.csv
+
+
+
 Makefile
 
 # Lambda Emulator

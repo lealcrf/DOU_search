@@ -21,7 +21,7 @@ if is_running_locally:
 class DOU:
     def __init__(
         self,
-        date_range: DateRange,
+        date_range: DateRange = DateRange.same_day(),
         get_from_remote_db=False,
         df=None,
     ):
@@ -34,39 +34,45 @@ class DOU:
 
         if not self.df.empty:
             self.df.assinatura = self.df.assinatura.apply(tirar_acentuacao)
-
+    @property
     def filtrar_por_assinatura(self):
         return FiltragemPorAssinatura(self.df)
 
+    @property
     def filtrar_por_conteudo(self):
         return FiltragemPorConteudo(self.df)
 
+    @property
     def filtrar_por_ementa(self):
         return FiltragemPorEmenta(self.df)
 
+    @property
     def filtrar_por_escopo(self):
         return FiltragemPorEscopo(self.df)
 
+    @property
     def filtrar_por_titulo(self):
         return FiltragemPorTitulo(self.df)
     
-    def gerar_sumula(self):
+    # def gerar_sumula(self, resultado, ingov_urls = False):
+    def gerar_sumula(self, ingov_urls = False):
         resultado = pd.concat(
             [
-                self.filtrar_por_titulo().aplicar_todos(),
-                self.filtrar_por_escopo().aplicar_todos(),
-                self.filtrar_por_ementa().aplicar_todos(),
-                self.filtrar_por_conteudo().aplicar_todos(),
-                self.filtrar_por_assinatura().aplicar_todos(),
+                self.filtrar_por_titulo.aplicar_todos(),
+                self.filtrar_por_escopo.aplicar_todos(),
+                self.filtrar_por_ementa.aplicar_todos(),
+                self.filtrar_por_conteudo.aplicar_todos(),
+                self.filtrar_por_assinatura.aplicar_todos(),
             ]
         )
+        
         # | Passa o filtro de exclusao
         sumula = FiltragemPorExclusao(resultado).aplicar_todos()
     
         # | Adiciona motivo se a publicação foi achada por mais de uma categoria de filtragem
         duplicados = sumula[sumula.duplicated("id", keep=False)]
         sumula = sumula.drop_duplicates(subset="id")
-
+        
         for i in duplicados.groupby("id").groups.values():
             index = i[0]
 
@@ -77,7 +83,7 @@ class DOU:
 
 
         # | Coloca os URLs do ingov
-        if is_running_locally:
+        if ingov_urls and is_running_locally:
             sumula["pdf"] = local_repo.pegar_urls_do_ingov(sumula.id_materia)
 
         return sumula

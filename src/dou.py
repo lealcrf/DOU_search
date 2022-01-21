@@ -34,6 +34,7 @@ class DOU:
 
         if not self.df.empty:
             self.df.assinatura = self.df.assinatura.apply(tirar_acentuacao)
+
     @property
     def filtrar_por_assinatura(self):
         return FiltragemPorAssinatura(self.df)
@@ -66,20 +67,21 @@ class DOU:
             ]
         )
         
-        # | Passa o filtro de exclusao
-        sumula = FiltragemPorExclusao(resultado).aplicar_todos()
-    
         # | Adiciona motivo se a publicação foi achada por mais de uma categoria de filtragem
-        duplicados = sumula[sumula.duplicated("id", keep=False)]
-        sumula = sumula.drop_duplicates(subset="id")
+        duplicados = resultado[resultado.duplicated("id", keep=False)]
+        sumula = resultado.drop_duplicates(subset="id")
         
+        
+        # | Passa o filtro de exclusao
+        sumula = FiltragemPorExclusao(sumula).excluir_instrucoes_normativas_do_banco_central()
+    
         for i in duplicados.groupby("id").groups.values():
             index = i[0]
 
             motivos = duplicados.loc[index].motivo.to_list()
             motivos = "\n".join(motivos)
 
-            sumula.loc[index].motivo = motivos
+            sumula.loc[index, "motivo"] = motivos
 
 
         # | Coloca os URLs do ingov

@@ -18,7 +18,7 @@ class Endpoints(Enum):
 
 def enviar_sumula_para_o_teams(
     sumula: dict,
-    dia: date,
+    dia = date.today(),
     api_endpoint: Endpoints = Endpoints.AREA_DE_TESTE,
 ):
     """Envia a súmula em fortado de cards para o canal do projeto no teams"""

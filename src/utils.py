@@ -12,7 +12,7 @@ def tirar_acentuacao(string: str):
 
 
 def str_to_date(string: str) -> date:
-    return datetime.strptime(string, "\d{4}-\d{2}-\d{2}").date()
+    return datetime.strptime(string, r"\d{4}-\d{2}-\d{2}").date()
 
 
 class DateRange:

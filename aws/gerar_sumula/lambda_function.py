@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from src.dou import DOU
 from src.models.publicacao import Publicacao
+from datetime import date
 from src.utils import DateRange
 import src.infrastructure.repository as repo
 
@@ -14,6 +15,11 @@ def lambda_handler(event, context):
 
     data_inicial = ultimos_dois_dous[1]
     data_final = ultimos_dois_dous[0]
+    if data_final != date.today():
+        return {
+            "body": f"Tentou fazer a súmula do dia {data_final}, mas era para ser a do dia {date.today()}",
+            "status": "ERRO",
+        }
 
     dou = DOU(
         date_range=DateRange(data_inicial, data_final),

@@ -30,7 +30,12 @@ def sumula_vazia_card():
         json.dumps(
             {
                 "type": "AdaptiveCard",
-                "body": [ementa("O robô não achou nenhuma publicação hoje")],
+                "body": [
+                    ementa(
+                        """Prezado(a),\n
+                        Informamos que hoje não foram identificadas publicações no Diário Oficial da União (DOU) a serem divulgadas no âmbito do Banco Central, segundo os critérios de pesquisa definidos."""
+                    )
+                ],
                 "msteams": {"width": "Full"},
                 "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
                 "version": "1.2",

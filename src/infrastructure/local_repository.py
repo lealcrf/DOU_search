@@ -12,7 +12,7 @@ import os
 
 
 def pegar_urls_do_ingov(ids: pd.Series):
-    """Faz um scrape para achar o link da do site in.gov baseado no id da matéria"""
+    """Faz um scrape para achar o link do site in.gov baseado no id da matéria"""
 
     options = Options()
     options.add_argument("--no-sandbox")  # exec with Lambda default user (root)

@@ -1,4 +1,4 @@
-from ..filtro import Filtro, Pattern
+from ..filtro import Filtro, Criterio
 
 
 class FiltragemPorEscopo(Filtro):

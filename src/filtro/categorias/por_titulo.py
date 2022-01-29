@@ -1,4 +1,4 @@
-from ..filtro import Filtro, Pattern
+from ..filtro import Filtro, Criterio
 
 
 class FiltragemPorTitulo(Filtro):
@@ -7,8 +7,8 @@ class FiltragemPorTitulo(Filtro):
             self.contains(
                 self.df.titulo,
                 [
-                    Pattern("Resolução Coremec"),  # A39
-                    Pattern(
+                    Criterio("Resolução Coremec"),  # A39
+                    Criterio(
                         r"\sCMN\W",
                         "Resolução CMN no título",
                     ),  # A43
@@ -21,9 +21,9 @@ class FiltragemPorTitulo(Filtro):
             self.contains(
                 self.df.titulo,
                 [
-                    Pattern("SUSEP"),
-                    Pattern("PREVIC"),
-                    Pattern("COAF"),
+                    Criterio("SUSEP"),
+                    Criterio("PREVIC"),
+                    Criterio("COAF"),
                 ],
             )
             & self.contains(self.df.ementa, "Banco Central"),  # R1

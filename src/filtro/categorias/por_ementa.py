@@ -1,4 +1,4 @@
-from ..filtro import Filtro, Pattern
+from ..filtro import Filtro, Criterio
 
 
 class FiltragemPorEmenta(Filtro):
@@ -7,34 +7,34 @@ class FiltragemPorEmenta(Filtro):
             condicoes=self.contains(
                 self.df.ementa,
                 [
-                    Pattern("Conselho de Controle de Atividades Financeiras"),  # A[123]
-                    Pattern(
+                    Criterio("Conselho de Controle de Atividades Financeiras"),  # A[123]
+                    Criterio(
                         "Comitê de Regulação e Fiscalização dos Mercados Financeiro, de Capitais, de Seguros, de Previdência e Capitalização"
                     ),  # A[123]
-                    Pattern("Comitê de Estabilidade Financeira"),  # A[123]
-                    Pattern("Educação financeira"),  # A[123],
-                    Pattern("Comitê Nacional de Educação Financeira"),  # A[123]
-                    Pattern("Imposto sobre Operações Financeiras"),  # A[123]
-                    Pattern(
+                    Criterio("Comitê de Estabilidade Financeira"),  # A[123]
+                    Criterio("Educação financeira"),  # A[123],
+                    Criterio("Comitê Nacional de Educação Financeira"),  # A[123]
+                    Criterio("Imposto sobre Operações Financeiras"),  # A[123]
+                    Criterio(
                         "Programa Nacional de Apoio às Microempresas e Empresas de Pequeno Porte"
                     ),  # A44
-                    Pattern("Lavagem de Dinheiro"),  # A45
-                    Pattern("Lei geral de proteção de dados"),  # R2A1
-                    Pattern("LGPD"),  # R2A1
-                    Pattern("Decreto nº 10.835"),  # R2A6
-                    Pattern(
+                    Criterio("Lavagem de Dinheiro"),  # A45
+                    Criterio("Lei geral de proteção de dados"),  # R2A1
+                    Criterio("LGPD"),  # R2A1
+                    Criterio("Decreto nº 10.835"),  # R2A6
+                    Criterio(
                         "Subdelega competências para a prática de atos de gestão de pessoas no âmbito do Ministério da Economia às autoridades que menciona"
                     ),  # R2A7
-                    Pattern(
+                    Criterio(
                         "(?:Sistema de Pessoal Civil da Administração (?:Pública)? Federal|SIPEC)"
                     ),  # R2A8
-                    Pattern("Lei nº 8.429"),  # R2A11
-                    Pattern("Lei nº 14.133"),  # R2A11
-                    Pattern("Programa de Estímulo ao Crédito"),  # R2Extra
-                    Pattern(
+                    Criterio("Lei nº 8.429"),  # R2A11
+                    Criterio("Lei nº 14.133"),  # R2A11
+                    Criterio("Programa de Estímulo ao Crédito"),  # R2Extra
+                    Criterio(
                         "entidades da administração pública federal"
                     ),  #! #TODO Temporário
-                    Pattern("Banco Central"),
+                    Criterio("Banco Central"),
                 ],
             )
         )
@@ -56,11 +56,11 @@ class FiltragemPorEmenta(Filtro):
             self.contains(
                 self.df.ementa,
                 [
-                    Pattern(
+                    Criterio(
                         "poder executivo federal",
                         'Publicação com escopo "Atos do Poder Executivo" ou "Ministério da Economia" da seção 1 que contém "poder executivo federal" na ementa e não é SETO/ME  Secretaria do Tesouro',
                     ),  # R3A2
-                    Pattern(
+                    Criterio(
                         "administração pública federal direta e indireta",
                         'Publicação com escopo "Atos do Poder Executivo" ou "Ministério da Economia" da seção 1 que contém "administração pública federal direta e indireta" na ementa e não é SETO/ME  Secretaria do Tesouro',
                     ),  # R3A3
@@ -69,7 +69,7 @@ class FiltragemPorEmenta(Filtro):
             & self.contains(self.df.secao, "DO1")
             & self.contains(
                 self.df.escopo,
-                [Pattern("Atos do Poder Executivo"), Pattern("Ministério da Economia")],
+                [Criterio("Atos do Poder Executivo"), Criterio("Ministério da Economia")],
             )
             & (~self.contains(self.df.titulo, "SETO\s?/\s?ME")),
             motivo='Publicações com escopo "Atos do Poder Executivo" e "Ministério da Economia" da seção 1 que contenham "poder executivo federal" ou "Administração Pública Federal Direta e Indireta" na ementa, excluindo as publicações da (SETO/ME) da Secretaria do Tesouro',

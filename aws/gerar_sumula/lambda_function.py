@@ -1,11 +1,7 @@
-from dotenv import load_dotenv
 from src.dou import DOU
 from src.models.publicacao import Publicacao
-from datetime import date
-from src.utils import DateRange
+from src.utils import DateRange, str_to_date, today_brazil_tz
 import src.infrastructure.repository as repo
-
-load_dotenv()
 
 
 def lambda_handler(event, context):
@@ -13,11 +9,12 @@ def lambda_handler(event, context):
         "SELECT DISTINCT TOP 2 * FROM c.data as d ORDER BY d DESC"
     )
 
-    data_inicial = ultimos_dois_dous[1]
-    data_final = ultimos_dois_dous[0]
-    if data_final != date.today():
+    data_inicial = str_to_date(ultimos_dois_dous[1])
+    data_final = str_to_date(ultimos_dois_dous[0])
+
+    if data_final != today_brazil_tz():
         return {
-            "body": f"Tentou fazer a súmula do dia {data_final}, mas era para ser a do dia {date.today()}",
+            "body": f"Tentou fazer a súmula do dia {data_final}, mas era para ser a do dia {today_brazil_tz()}",
             "status": "ERRO",
         }
 

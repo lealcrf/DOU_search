@@ -76,10 +76,10 @@ class FiltragemPorEmenta(Filtro):
                 self.ementa.contem(r"entidades da administração pública federal"),
                 motivo='"entidades da administração pública federal" na ementa',
             ),  #! #TODO Temporário
-            # Criterio(  # T2022-1-19, R2022-1-30 #TODO Ver melhor o problema
-            #     self.ementa.contem(r"Decreto nº 71.733"),
-            #     motivo='"Decreto 71.733" na ementa',
-            # ),
+            Criterio(  # T2022-1-19, R2022-1-27, T2022-1-31-Carlos
+                self.ementa.contem(r"Decreto nº 71.733"),
+                motivo='"Decreto 71.733" na ementa',
+            ),
         ]
 
     def especificos(self):

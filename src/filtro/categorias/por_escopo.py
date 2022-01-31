@@ -11,7 +11,7 @@ class FiltragemPorEscopo(Filtro):
             ),
             Criterio(
                 self.escopo.contem(r"Secretaria Especial do Tesouro e Orçamento")
-                & self.conteudo.contem(r"Banco Central"),
+                & self.ementa.contem(r"Banco Central"),
                 motivo="'Secretaria Especial do Tesouro e Orçamento' no escopo e menciona o Banco Central no conteúdo",
             ),
         ]

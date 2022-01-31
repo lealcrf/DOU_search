@@ -6,8 +6,9 @@ class FiltragemPorAssinatura(Filtro):
         yield from [
             Criterio(  # A28
                 self.assinatura.contem("RICARDO LIÁO")
-                & (self.tipo_normativo == "Portaria"),
-                # & self.secao.contem("DO1"),  # R2A1
+                & (self.tipo_normativo == "Portaria")
+                & self.secao.contem("DO1")  # R2A1
+                & self.titulo.nao_contem("DECISÃO"),  # R2A5
                 motivo="Portaria assinada pelo pelo presidente do COAF",
             )
         ]

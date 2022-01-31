@@ -17,7 +17,6 @@ class Criterio:
         motivo_col: Series = df.loc[self.condicao, "motivo"]
 
         is_motivo_null = motivo_col.isna()
-
         motivo_col[~is_motivo_null] = motivo_col[~is_motivo_null] + "\n" + self.motivo
         motivo_col[is_motivo_null] = self.motivo
 

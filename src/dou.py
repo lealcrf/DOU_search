@@ -58,6 +58,9 @@ class DOU:
     @property
     def filtrar_por_titulo(self):
         return FiltragemPorTitulo(self.df)
+    
+    def filtrar(self, condicoes):
+        return self.df[condicoes]
 
     def gerar_sumula(self, ingov_urls=False):
 
@@ -81,7 +84,7 @@ class DOU:
 
         sumula = self.df[pubs_para_sumula]
 
-        # # | Passa o filtro de exclusao
+        # # | #TODO  Passa o filtro de exclusao 
         # sumula = FiltragemPorExclusao(sumula).excluir_instrucoes_normativas_do_banco_central()
 
         # | Coloca os URLs do ingov

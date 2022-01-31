@@ -58,7 +58,7 @@ class FiltragemPorEmenta(Filtro):
                 self.ementa.contem(
                     r"(?:Sistema de Pessoal Civil da Administração (?:Pública)? Federal|SIPEC)"
                 ),
-                condicao="Publicação da SIPEC #TODO Terminar de fazer as restrições do R2A8",
+                motivo="Publicação da SIPEC #TODO Terminar de fazer as restrições do R2A8",
             ),
             Criterio(  # R2A11
                 self.ementa.contem(r"Lei nº 8.429"),
@@ -76,10 +76,10 @@ class FiltragemPorEmenta(Filtro):
                 self.ementa.contem(r"entidades da administração pública federal"),
                 motivo='"entidades da administração pública federal" na ementa',
             ),  #! #TODO Temporário
-            Criterio(  # T2022-1-19, R2022-1-30
-                self.ementa.contem(r"Decreto nº 71.733"),
-                motivo='"Decreto 71.733" na ementa',
-            ),
+            # Criterio(  # T2022-1-19, R2022-1-30 #TODO Ver melhor o problema
+            #     self.ementa.contem(r"Decreto nº 71.733"),
+            #     motivo='"Decreto 71.733" na ementa',
+            # ),
         ]
 
     def especificos(self):
@@ -110,8 +110,9 @@ class FiltragemPorEmenta(Filtro):
 
     def menciona_o_banco_central(self):
         yield from [
-            Criterio(
-                self.ementa.contem(r"Banco Central"),
+            Criterio(  # TODO Implementa o filtro por exclusao e tira meu workaroung
+                self.ementa.contem(r"Banco Central")
+                & self.tipo_normativo.nao_contem(r"Instrução Normativa"),
                 motivo="Menciona o Banco Central na ementa",
             ),
             Criterio(  # R2A10
@@ -123,10 +124,7 @@ class FiltragemPorEmenta(Filtro):
                 self.ementa.contem(
                     r"Grupo de Ação Financeira contra a Lavagem de Dinheiro e o Financiamento do Terrorismo"
                 )
-                & (
-                    self.conteudo.contem(r"Banco Central")
-                    | self.ementa.contem(r"Banco Central")
-                ),
-                motivo='"Grupo de Ação Financeira contra a Lavagem de Dinheiro e o Financiamento do Terrorismo" na ementa e menciona o Banco Central no conteúdo',
+                & self.conteudo.contem(r"Banco Central"),
+                motivo='"Grupo de Ação Financeira contra a Lavagem de Dinheiro e o Financiamento do Terrorismo" na ementa e menciona o Banco Central',
             ),
         ]

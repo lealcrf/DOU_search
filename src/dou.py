@@ -11,6 +11,7 @@ from .filtro.categorias.por_ementa import FiltragemPorEmenta
 from .filtro.categorias.por_escopo import FiltragemPorEscopo
 from .filtro.categorias.por_titulo import FiltragemPorTitulo
 from .filtro.categorias.por_exclusao import FiltragemPorExclusao
+from .models.publicacao import Publicacao
 from dotenv import load_dotenv
 import os
 
@@ -63,10 +64,10 @@ class DOU:
         criterios = chain(
             self.filtrar_por_assinatura.pegar_criterios(),
             self.filtrar_por_titulo.pegar_criterios(),
-            self.filtrar_por_escopo.pegar_criteros(),
-            self.filtrar_por_ementa.pegar_criteros(),
-            self.filtrar_por_conteudo.pegar_criteros(),
-            # self.filtrar_por_assinatura.pegar_criteros(),
+            self.filtrar_por_escopo.pegar_criterios(),
+            self.filtrar_por_ementa.pegar_criterios(),
+            self.filtrar_por_conteudo.pegar_criterios(),
+            # FiltragemPorExclusao(self.df).teste()
         )
 
         all_conditions: list[BooleanArray] = []
@@ -77,12 +78,8 @@ class DOU:
             all_conditions.append(criterio.condicao)
 
         pubs_para_sumula: BooleanArray = functools.reduce(ior, all_conditions)
-        
-        sumula = self.df[pubs_para_sumula]
 
-        # # | Adiciona motivo se a publicação foi achada por mais de uma categoria de filtragem
-        # duplicados = resultado[resultado.duplicated("id", keep=False)]
-        # sumula = resultado.drop_duplicates(subset="id")
+        sumula = self.df[pubs_para_sumula]
 
         # # | Passa o filtro de exclusao
         # sumula = FiltragemPorExclusao(sumula).excluir_instrucoes_normativas_do_banco_central()

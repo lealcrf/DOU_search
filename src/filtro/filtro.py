@@ -62,3 +62,11 @@ class NaoContemPandasExtension:
 
     def __call__(self, regex: str):
         return ~self.coluna.str.contains(regex, na=False, flags=re.IGNORECASE)
+
+@pd.api.extensions.register_series_accessor("igual")
+class NaoContemPandasExtension:
+    def __init__(self, coluna: Series):
+        self.coluna = coluna
+
+    def __call__(self, string):
+        return (self.coluna == string)

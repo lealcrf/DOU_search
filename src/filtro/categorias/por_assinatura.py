@@ -2,7 +2,7 @@ from ..filtro import Filtro, Criterio
 
 
 class FiltragemPorAssinatura(Filtro):
-    def criterios_especificos(self):
+    def especificos(self):
         yield from [
             Criterio(  # A28
                 self.assinatura.contem("RICARDO LIÁO")

@@ -14,7 +14,7 @@ class FiltragemPorTitulo(Filtro):
             ),
         ]
 
-    def mencionando_banco_central(self):
+    def menciona_o_banco_central(self):
         yield from [
             Criterio(  # R1
                 self.titulo.contem(r"SUSEP") & self.ementa.contem("Banco Central"),

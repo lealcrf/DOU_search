@@ -1,7 +1,8 @@
 from ..filtro import Filtro, Criterio
 
+
 class FiltragemPorAssinatura(Filtro):
-    def assinadas_pelo_presidente_do_COAF(self):
+    def criterios_especificos(self):
         yield from [
             Criterio(  # A28
                 self.assinatura.contem("RICARDO LIÁO")

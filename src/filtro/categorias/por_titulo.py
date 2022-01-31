@@ -1,39 +1,36 @@
-from ..filtro import Filtro, Pattern
+from ..filtro import Filtro, Criterio
 
 
 class FiltragemPorTitulo(Filtro):
-    def filtrar_por_titulo(self):
-        return self.query(
-            self.contains(
-                self.df.titulo,
-                [
-                    Pattern("Resolução Coremec"),  # A39
-                    Pattern(
-                        r"\sCMN\W",
-                        "Resolução CMN no título",
-                    ),  # A43
-                ],
-            )
-        )
+    def geral(self):
+        yield from [
+            Criterio(  # A39
+                self.titulo.contem(r"Resolução Coremec"),
+                motivo="Resolução Coremec no título",
+            ),
+            Criterio(  # A43
+                self.titulo.contem(r"\sCMN\W"),
+                motivo="Resolução CMN no título",
+            ),
+        ]
 
-    def banco_central_na_ementa(self):
-        self.query(
-            self.contains(
-                self.df.titulo,
-                [
-                    Pattern("SUSEP"),
-                    Pattern("PREVIC"),
-                    Pattern("COAF"),
-                ],
-            )
-            & self.contains(self.df.ementa, "Banco Central"),  # R1
-            motivo="Publicação da SUSEP, PREVIC OU COAF que menciona o Banco Central na emenda",
-        )
-
-    def banco_central_no_conteudo(self):
-        return self.query(
-            self.contains(self.df.titulo, "PORTARIA SETO")
-            & self.contains(self.df.conteudo, "Banco Central"),
-            motivo='Publicações que contenham "PORTARIA SETO" no título e mencionem o Banco Central no conteúdo',
-            # Conversa com Carlos e Ligiane no dia 04/01/2022
-        )
+    def menciona_o_banco_central(self):
+        yield from [
+            Criterio(  # R1
+                self.titulo.contem(r"SUSEP") & self.ementa.contem("Banco Central"),
+                motivo="Publicação da SUSEP que menciona o Banco Central na Ementa",
+            ),
+            Criterio(  # R1
+                self.titulo.contem(r"PREVIC") & self.ementa.contem("Banco Central"),
+                motivo="Publicação da PREVIC que menciona o Banco Central na Ementa",
+            ),
+            Criterio(  # R1
+                self.titulo.contem(r"COAF") & self.ementa.contem("Banco Central"),
+                motivo="Publicação do COAF que menciona o Banco Central na Ementa",
+            ),
+            Criterio(  # Conversa com Carlos e Ligiane no dia 04/01/2022
+                self.titulo.contem(r"PORTARIA SETO")
+                & self.conteudo.contem("Banco Central"),
+                motivo="Portaria SETO que menciona o Banco Central no Conteúdo",
+            ),
+        ]

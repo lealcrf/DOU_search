@@ -40,7 +40,7 @@ class Publicacao:
             id_materia=json["id_materia"],
             motivo=None,
         )
-    
+
     @staticmethod
     def get_fields():
         return list(Publicacao.__annotations__.keys())

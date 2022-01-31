@@ -5,126 +5,68 @@ import pandas as pd
 from pandas.core.arrays.boolean import BooleanArray
 from pandas.core.frame import DataFrame
 from pandas.core.series import Series
-from ..utils import tirar_acentuacao
+import itertools
 
 
 @dataclass
-class Pattern:
-    regex: str
-    motivo: str = None
+class Criterio:
+    condicao: BooleanArray
+    motivo: str
 
-    def completar_motivo(self, coluna):
-        motivo = "• " + (
-            self.motivo if self.motivo else self.criar_motivo_generico(coluna)
-        )
-        padrao_estipulado = "{}[{}]".format(coluna, self.regex)
-        return motivo + " => " + padrao_estipulado
+    def aplicar_motivo(self, df: DataFrame):
+        motivo_col: Series = df.loc[self.condicao, "motivo"]
 
-    def criar_motivo_generico(self, coluna):
-        if coluna in ["assinatura", "ementa"]:
-            return 'Achou "{}" na {}'.format(self.regex, coluna)
+        is_motivo_null = motivo_col.isna()
+        motivo_col[~is_motivo_null] = motivo_col[~is_motivo_null] + "\n" + self.motivo
+        motivo_col[is_motivo_null] = self.motivo
 
-        return 'Achou "{}" no {}'.format(self.regex, coluna)
+        df.loc[self.condicao, "motivo"] = motivo_col
+
 
 class Filtro:
     def __init__(self, df: DataFrame):
-        self.df: pd.DataFrame = df.copy()
-    
-    def aplicar_todos(self):
+        self.conteudo = df["conteudo"]
+        self.secao = df["secao"]
+        self.tipo_normativo = df["tipo_normativo"]
+        self.escopo = df["escopo"]
+        self.titulo = df["titulo"]
+        self.ementa = df["ementa"]
+        self.assinatura = df["assinatura"]
+
+    def pegar_criterios(self):
         results = []
+
         for name in dir(self):
             if name[0] != "_" and name:
                 obj = getattr(self, name)
 
-                if callable(obj) and name not in [
-                    self.contains.__name__,
-                    self.query.__name__,
-                    self.aplicar_todos.__name__,
-                ]:
+                if callable(obj) and name != self.pegar_criterios.__name__:
                     results.append(obj())
 
-        return pd.concat(results)
-        
-
-    def contains(self, col: Series, patterns: List[Pattern]) -> BooleanArray:
-        # def contains(self, col: Series, patterns: List[Pattern] | str | List[str]) -> BooleanArray:
-        """Procura na coluna os items que satisfaçam algum dos padrões
-
-        - Se [patterns] for List[Pattern], vai adicionar o motivo contido em pattern.motivo na sumula
-        - Se [patterns] for str, nenhum motivo será adicionado
-        """
-        p_type = type(patterns)
-        try:
-            inner_type = str if type(patterns[0]) == str else Pattern
-        except:
-            inner_type = None
-
-        # | Cria o regex a partir das/do [[patterns]]
-        # Se [patters] for list[Pattern]
-        if (p_type is list) and (inner_type is Pattern):
-            # Substitui o motivo dos Patterns que tem motivo vazio por um motivo generico
-            for p in patterns:
-                p.motivo = p.completar_motivo(col.name)
-
-            regex = "|".join([f"({p.regex})" for p in patterns])
-
-        # Se [patterns] for list[str]
-        elif (p_type is list) and (inner_type is str):
-            regex = "|".join(["({})".format(p) for p in patterns])
-
-        # Se [patterns] for str
-        elif p_type is str:
-            regex = "({})".format(patterns)
-
-        # Já que tiramos a acentuação do [df.assinatura], temos que fazer o mesmo com as keywords
-        if col.name == "assinatura":
-            regex = tirar_acentuacao(regex)
-
-        # (Função Auxiliar) retorna o motivo se o item foi escolhido, caso contrário retorna None
-        def _match_motivos(item):
-            if item:
-                match = re.search(regex, item, flags=re.IGNORECASE)
-                if match:
-                    # Se for list[Pattern]
-                    if (p_type is list) and (inner_type is Pattern):
-                        # Pega o Pattern.motivo correspondente ao regex do match
-                        return patterns[match.lastindex - 1].motivo
-
-                    # Se for str ou list[str]
-                    elif (p_type is str) or (p_type is list and inner_type is str):
-                        # Apenas [Pattern]'s tem motivo, no entanto temos que retornar alguma coisa, já que vamos usar  o método [notna()] para fazer o boolean vector que será retornado por essa função.
-                        return patterns
-
-        # | Cria um df contendo o motivo das publicações que entraram e None nas que não entraram
-        motivos: Series = col.apply(_match_motivos)
-
-        # | Adiciona os motivos
-        if (p_type is list) and (inner_type is Pattern):  # Só [Pattern] tem motivo
-            # tmp = self._df
-            self.df.motivo = self.df.motivo.combine(motivos, self._add_new_motivo)
+        return itertools.chain.from_iterable(results)
 
 
-        # | Retorna um boolean array que diz quais são os items que passaram no filtro
-        return motivos.notna()
+@pd.api.extensions.register_series_accessor("contem")
+class ContemPandasExtension:
+    def __init__(self, coluna: Series):
+        self.coluna = coluna
 
-    def _add_new_motivo(self, antigo, novo):
-        # Caso esse for o primeiro motivo no item
-        if antigo is None and type(novo) is str:
-            return novo
+    def __call__(self, regex):
+        return self.coluna.str.contains(regex, na=False, flags=re.IGNORECASE)
 
-        # Caso tenha mais motivos no item
-        if antigo is str and type(novo) is str:
-            return antigo + "\n" + novo
 
-    def query(self, condicoes: BooleanArray, motivo=None) -> pd.DataFrame:
-        res_df = self.df[condicoes]
+@pd.api.extensions.register_series_accessor("nao_contem")
+class NaoContemPandasExtension:
+    def __init__(self, coluna: Series):
+        self.coluna = coluna
 
-        # Caso ele queira apenas 1 motivo para toda query
-        if motivo:
-            res_df.motivo = res_df.motivo.combine(motivo, self._add_new_motivo)
+    def __call__(self, regex: str):
+        return ~self.coluna.str.contains(regex, na=False, flags=re.IGNORECASE)
 
-        # Coloca essas mudanças no dataframe original
-        self.df.update(res_df)
+@pd.api.extensions.register_series_accessor("igual")
+class NaoContemPandasExtension:
+    def __init__(self, coluna: Series):
+        self.coluna = coluna
 
-        # Retorna apenas o que foi achado pela pesquisa
-        return res_df
+    def __call__(self, string):
+        return (self.coluna == string)

@@ -1,4 +1,7 @@
-import pandas as pd
+import functools
+from itertools import chain
+from operator import ior
+from pandas.core.arrays.boolean import BooleanArray
 
 import src.infrastructure.repository as repo
 from .utils import DateRange, tirar_acentuacao
@@ -8,6 +11,7 @@ from .filtro.categorias.por_ementa import FiltragemPorEmenta
 from .filtro.categorias.por_escopo import FiltragemPorEscopo
 from .filtro.categorias.por_titulo import FiltragemPorTitulo
 from .filtro.categorias.por_exclusao import FiltragemPorExclusao
+from .models.publicacao import Publicacao
 from dotenv import load_dotenv
 import os
 
@@ -54,35 +58,31 @@ class DOU:
     @property
     def filtrar_por_titulo(self):
         return FiltragemPorTitulo(self.df)
-    
-    # def gerar_sumula(self, resultado, ingov_urls = False):
-    def gerar_sumula(self, ingov_urls = False):
-        resultado = pd.concat(
-            [
-                self.filtrar_por_titulo.aplicar_todos(),
-                self.filtrar_por_escopo.aplicar_todos(),
-                self.filtrar_por_ementa.aplicar_todos(),
-                self.filtrar_por_conteudo.aplicar_todos(),
-                self.filtrar_por_assinatura.aplicar_todos(),
-            ]
+
+    def gerar_sumula(self, ingov_urls=False):
+
+        criterios = chain(
+            self.filtrar_por_assinatura.pegar_criterios(),
+            self.filtrar_por_titulo.pegar_criterios(),
+            self.filtrar_por_escopo.pegar_criterios(),
+            self.filtrar_por_ementa.pegar_criterios(),
+            self.filtrar_por_conteudo.pegar_criterios(),
+            # FiltragemPorExclusao(self.df).teste()
         )
-        
-        # | Adiciona motivo se a publicação foi achada por mais de uma categoria de filtragem
-        duplicados = resultado[resultado.duplicated("id", keep=False)]
-        sumula = resultado.drop_duplicates(subset="id")
-        
-        
-        # | Passa o filtro de exclusao
-        sumula = FiltragemPorExclusao(sumula).excluir_instrucoes_normativas_do_banco_central()
-    
-        for i in duplicados.groupby("id").groups.values():
-            index = i[0]
 
-            motivos = duplicados.loc[index].motivo.to_list()
-            motivos = "\n".join(motivos)
+        all_conditions: list[BooleanArray] = []
 
-            sumula.loc[index, "motivo"] = motivos
+        for criterio in criterios:
+            criterio.aplicar_motivo(self.df)
 
+            all_conditions.append(criterio.condicao)
+
+        pubs_para_sumula: BooleanArray = functools.reduce(ior, all_conditions)
+
+        sumula = self.df[pubs_para_sumula]
+
+        # # | Passa o filtro de exclusao
+        # sumula = FiltragemPorExclusao(sumula).excluir_instrucoes_normativas_do_banco_central()
 
         # | Coloca os URLs do ingov
         if ingov_urls and is_running_locally:

@@ -65,7 +65,7 @@ class DOU:
             self.filtrar_por_titulo.pegar_criterios(),
             self.filtrar_por_escopo.pegar_criteros(),
             self.filtrar_por_ementa.pegar_criteros(),
-            # self.filtrar_por_conteudo.pegar_criteros(),
+            self.filtrar_por_conteudo.pegar_criteros(),
             # self.filtrar_por_assinatura.pegar_criteros(),
         )
 

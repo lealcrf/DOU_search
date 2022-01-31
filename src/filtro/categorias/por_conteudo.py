@@ -2,127 +2,168 @@ from ..filtro import Filtro, Criterio
 
 
 class FiltragemPorConteudo(Filtro):
-    def frases_gerais(self):
-        return self.query(
-            self.contains(
-                self.df.conteudo,
-                [
-                    Criterio("Comissão Técnica da Moeda e do Crédito"),  # A8
-                    Criterio(
-                        "Secretário-Executivo Adjunto da Secretaria-Executiva do Ministério do Trabalho e Previdência"
-                    ),  # A23
-                    Criterio(
-                        "Comitê de Regulação e Fiscalização dos Mercados Financeiro, de Capitais, de Seguros, de Previdência e Capitalização",
-                    ),  # A9
-                    # ******************************** Nomeação/Exoneração ****************************************
-                    Criterio(
-                        "cargo de Presidente do Banco Central",
-                        "Nomeação/Exoneração do Presidente do Banco Central",
-                    ),  # A6
-                    Criterio(
-                        "cargo de (?:Diretor|Diretora) do Banco Central",
-                        "Nomeação/Exoneração do Diretor(a) do Banco Central",
-                    ),  # A7
-                    Criterio(
-                        "cargo de Ministro de Estado da Economia",
-                        "Nomeação/Exoneração do Ministro de Estado da Economia",
-                    ),  # A10
-                    Criterio(
-                        "cargo de Ministro de Estado do Trabalho e Previdência",
-                        "Nomeação/Exoneração do Ministro de Estado do Trabalho e Previdência",
-                    ),
-                    Criterio(
-                        "cargo de Secretário Especial de Fazenda do Ministério da Economia",
-                        "Nomeação/Exoneração do Secretário Especial de Fazenda do Ministério da Economia",
-                    ),  # A11
-                    Criterio(
-                        "cargo de Secretário-Executivo do Ministério da Economia",
-                        "Nomeação/Exoneração do Secretário-Executivo do Ministério da Economia",
-                    ),  # A12
-                    Criterio(
-                        "cargo de Secretário de Política Econômica",
-                        "Nomeação/Exoneração do Secretário de Política Econômica",
-                    ),  # A13
-                    Criterio(
-                        "cargo de Secretário do Tesouro Nacional",
-                        "Nomeação/Exoneração do Secretário do Tesouro Nacional",
-                    ),  # A14
-                    Criterio(
-                        "cargo de Presidente da Casa da Moeda do Brasil",
-                        "Nomeação/Exoneração do Presidente da Casa da Moeda do Brasil",
-                    ),  # A15
-                    Criterio(
-                        "cargo de Diretor da Comissão de Valores Mobiliários",
-                        "Nomeação/Exoneração do Diretor da Comissão de Valores Mobiliários",
-                    ),  # A16
-                    Criterio(
-                        "cargo de Superintendente da Superintendência de Seguros Privados",
-                        "Nomeação/Exoneração do Superintendente da Superintendência de Seguros Privados",
-                    ),  # A17
-                    Criterio(
-                        "cargo de Diretor da Superintendência de Seguros Privados",
-                        "Nomeação/Exoneração do Diretor da Superintendência de Seguros Privados",
-                    ),  # A18
-                    Criterio(
-                        "cargo de Diretor-Superintendente da Superintendência Nacional de Previdência Complementar",
-                        "Nomeação/Exoneração do Diretor-Superintendente da Superintendência Nacional de Previdência Complementar",
-                    ),  # A19
-                    Criterio(
-                        "cargo de Diretor de Licenciamento da Superintendência Nacional de Previdência Complementar",
-                        "Nomeação/Exoneração do Diretor de Licenciamento da Superintendência Nacional de Previdência Complementar",
-                    ),  # A20
-                    Criterio(
-                        "cargo de Secretário Especial Adjunto da Secretaria Especial de Previdência e Trabalho do Ministério da Economia",
-                        "Nomeação/Exoneração do Secretário Especial Adjunto da Secretaria Especial de Previdência e Trabalho do Ministério da Economia",
-                    ),  # A21
-                    Criterio(
-                        "cargo de Secretário-Executivo do Ministério do Trabalho e Previdência",
-                        "Nomeação/Exoneração do Secretário-Executivo do Ministério do Trabalho e Previdência",
-                    ),  # A22
-                    Criterio(
-                        "cargo de Secretário Especial do Tesouro e Orçamento do Ministério da Economia",
-                        "Nomeação/Exoneração do Secretário Especial do Tesouro e Orçamento do Ministério da Economia",
-                    ),  # R2-A3
-                    Criterio(
-                        "cargo de Procurador-Geral Federal da Advocacia-Geral da União",
-                        "Nomeação/Exoneração do Procurador-Geral Federal da Advocacia-Geral da União",
-                    ),  # R2-A9
-                    # ******************************** Afastamentos ****************************************
-                    Criterio(
-                        "(?:Exposição|Exposições) de Motivos.{0,200}(?:afastamento|férias).{0,50} Presidente do Banco Central do Brasil",
-                        "Afastamento do Presidente do BC",
-                    ),  # A29",
-                    Criterio(
-                        "(?:Exposição|Exposições) de Motivos.{0,200}(?:afastamento|férias).{0,50} Ministro de Estado da Economia",
-                        "Afastamento do Ministro de Estado da Economia",
-                    ),  # A30",
-                    Criterio(
-                        "(?:A DIRETORA|O DIRETOR) DE ADMINISTRAÇÃO DO BANCO CENTRAL DO BRASIL",
-                        "Despacho do Diretor de Administração",
-                    ),  # A31",
-                    Criterio(
-                        "^.{0,100}PORTARIA.+O MINISTRO DE ESTADO DA ECONOMIA.+afastamento.+Banco Central",
-                        # Já que o conteudo vem com o titulo junto, eu precisei dizer que o título (primeiros 100 caracteres) deve conter PORTARIA
-                        "Portaria do Ministro da Economia afastando alguém do Banco Central",
-                    ),  # A32",
-                    Criterio(
-                        "Despacho do Presidente do Banco Central do Brasil.+Presidente do COAF",
-                        "Afastamento do presidente do COAF",
-                    ),  # Sempre que o presidente do COAF se ausenta, o Presidente do Banco Central do Brasil precisa fazer um despacho",
-                    Criterio(
-                        "Ministros? de Estado.*Decreto nº 71.733|Decreto nº 71.733.*Ministros? de Estado",
-                        '"Ministro de Estado" e "Decreto 71.733" concomitantemente na ementa ou no texto',
-                    ),#T2022-1-19
-                ],
-            )
-        )
+    def gerais(self):
+        yield from [
+            Criterio(  # A8
+                self.conteudo.contem(r"Comissão Técnica da Moeda e do Crédito"),
+                motivo='"Comissão Técnica da Moeda e do Crédito" no conteúdo',
+            ),
+            Criterio(  # A23
+                self.conteudo.contem(
+                    r"Secretário-Executivo Adjunto da Secretaria-Executiva do Ministério do Trabalho e Previdência"
+                ),
+                motivo='"Secretário-Executivo Adjunto da Secretaria-Executiva do Ministério do Trabalho e Previdência" no conteúdoo',
+            ),
+            Criterio(  # A9
+                self.conteudo.contem(
+                    r"Comitê de Regulação e Fiscalização dos Mercados Financeiro, de Capitais, de Seguros, de Previdência e Capitalização",
+                ),
+                motivo='"Comitê de Regulação e Fiscalização dos Mercados Financeiro, de Capitais, de Seguros, de Previdência e Capitalização" no conteúdo',
+            ),
+        ]
 
-    def da_subchefia_para_assuntos_juridicos(self):
-        return self.query(
-            self.contains(
-                self.df.conteudo,
-                "temas jurídicos relevantes para a administração pública",
+    def nomeacoes_e_exoneracoes(self):
+        yield from [
+            Criterio(  # A6
+                self.conteudo.contem(r"cargo de Presidente do Banco Central"),
+                motivo="Nomeação/Exoneração do Presidente do Banco Central",
+            ),
+            Criterio(  # A7
+                self.conteudo.contem(r"cargo de (?:Diretor|Diretora) do Banco Central"),
+                motivo="Nomeação/Exoneração do Diretor(a) do Banco Central",
+            ),
+            Criterio(  # A10
+                self.conteudo.contem(r"cargo de Ministro de Estado da Economia"),
+                motivo="Nomeação/Exoneração do Ministro de Estado da Economia",
+            ),
+            Criterio(
+                self.conteudo.contem(
+                    r"cargo de Ministro de Estado do Trabalho e Previdência"
+                ),
+                motivo="Nomeação/Exoneração do Ministro de Estado do Trabalho e Previdência",
+            ),
+            Criterio(  # A11
+                self.conteudo.contem(
+                    r"cargo de Secretário Especial de Fazenda do Ministério da Economia"
+                ),
+                motivo="Nomeação/Exoneração do Secretário Especial de Fazenda do Ministério da Economia",
+            ),
+            Criterio(  # A12
+                self.conteudo.contem(
+                    r"cargo de Secretário-Executivo do Ministério da Economia"
+                ),
+                motivo="Nomeação/Exoneração do Secretário-Executivo do Ministério da Economia",
+            ),
+            Criterio(  # A13
+                self.conteudo.contem(r"cargo de Secretário de Política Econômica"),
+                motivo="Nomeação/Exoneração do Secretário de Política Econômica",
+            ),
+            Criterio(  # A14
+                self.conteudo.contem(r"cargo de Secretário do Tesouro Nacional"),
+                motivo="Nomeação/Exoneração do Secretário do Tesouro Nacional",
+            ),
+            Criterio(  # A15
+                self.conteudo.contem(r"cargo de Presidente da Casa da Moeda do Brasil"),
+                motivo="Nomeação/Exoneração do Presidente da Casa da Moeda do Brasil",
+            ),
+            Criterio(  # A16
+                self.conteudo.contem(
+                    r"cargo de Diretor da Comissão de Valores Mobiliários"
+                ),
+                motivo="Nomeação/Exoneração do Diretor da Comissão de Valores Mobiliários",
+            ),
+            Criterio(  # A17
+                self.conteudo.contem(
+                    r"cargo de Superintendente da Superintendência de Seguros Privados"
+                ),
+                motivo="Nomeação/Exoneração do Superintendente da Superintendência de Seguros Privados",
+            ),
+            Criterio(  # A18
+                self.conteudo.contem(
+                    r"cargo de Diretor da Superintendência de Seguros Privados"
+                ),
+                motivo="Nomeação/Exoneração do Diretor da Superintendência de Seguros Privados",
+            ),
+            Criterio(  # A19
+                self.conteudo.contem(
+                    r"cargo de Diretor-Superintendente da Superintendência Nacional de Previdência Complementar"
+                ),
+                motivo="Nomeação/Exoneração do Diretor-Superintendente da Superintendência Nacional de Previdência Complementar",
+            ),
+            Criterio(  # A20
+                self.conteudo.contem(
+                    r"cargo de Diretor de Licenciamento da Superintendência Nacional de Previdência Complementar"
+                ),
+                motivo="Nomeação/Exoneração do Diretor de Licenciamento da Superintendência Nacional de Previdência Complementar",
+            ),
+            Criterio(  # A21
+                self.conteudo.contem(
+                    r"cargo de Secretário Especial Adjunto da Secretaria Especial de Previdência e Trabalho do Ministério da Economia"
+                ),
+                motivo="Nomeação/Exoneração do Secretário Especial Adjunto da Secretaria Especial de Previdência e Trabalho do Ministério da Economia",
+            ),
+            Criterio(  # A22
+                self.conteudo.contem(
+                    r"cargo de Secretário-Executivo do Ministério do Trabalho e Previdência"
+                ),
+                motivo="Nomeação/Exoneração do Secretário-Executivo do Ministério do Trabalho e Previdência",
+            ),
+            Criterio(  # R2-A3
+                self.conteudo.contem(
+                    r"cargo de Secretário Especial do Tesouro e Orçamento do Ministério da Economia"
+                ),
+                motivo="Nomeação/Exoneração do Secretário Especial do Tesouro e Orçamento do Ministério da Economia",
+            ),
+            Criterio(  # R2-A9
+                self.conteudo.contem(
+                    r"cargo de Procurador-Geral Federal da Advocacia-Geral da União"
+                ),
+                motivo="Nomeação/Exoneração do Procurador-Geral Federal da Advocacia-Geral da União",
+            ),
+        ]
+
+    def afastamentos(self):
+        yield from [
+            Criterio(  # A29
+                self.conteudo.contem(
+                    r"(?:Exposição|Exposições) de Motivos.{0,200}(?:afastamento|férias).{0,50} Presidente do Banco Central do Brasil"
+                ),
+                motivo="Afastamento do Presidente do BC",
+            ),
+            Criterio(  # A30
+                self.conteudo.contem(
+                    r"(?:Exposição|Exposições) de Motivos.{0,200}(?:afastamento|férias).{0,50} Ministro de Estado da Economia"
+                ),
+                motivo="Afastamento do Ministro de Estado da Economia",
+            ),
+            Criterio(  # A31
+                self.conteudo.contem(
+                    r"(?:A DIRETORA|O DIRETOR) DE ADMINISTRAÇÃO DO BANCO CENTRAL DO BRASIL"
+                ),
+                motivo="Despacho do Diretor de Administração",
+            ),
+            Criterio(  # A32
+                self.conteudo.contem(
+                    r"^.{0,100}PORTARIA.+O MINISTRO DE ESTADO DA ECONOMIA.+afastamento.+Banco Central",
+                    # Já que o conteudo vem com o titulo junto, eu precisei dizer que o título (primeiros 100 caracteres) deve conter PORTARIA
+                ),
+                motivo="Portaria do Ministro da Economia afastando alguém do Banco Central",
+            ),
+            Criterio(  # Sempre que o presidente do COAF se ausenta, o Presidente do Banco Central do Brasil precisa fazer um despacho
+                self.conteudo.contem(
+                    r"Despacho do Presidente do Banco Central do Brasil.+Presidente do COAF"
+                ),
+                motivo="Afastamento do presidente do COAF",
+            ),
+        ]
+
+    def especificos(self):
+        yield from [
+            Criterio(
+                self.conteudo.contem(
+                    r"temas jurídicos relevantes para a administração pública"
+                )
+                & self.escopo.contem(r"Subchefia para Assuntos Jurídicos"),
+                motivo='Publicação da Subchefia para Assuntos Jurídicos que contém "temas jurídicos relevantes para a administração pública" no conteúdo',
             )
-            & self.contains(self.df.escopo, "Subchefia para Assuntos Jurídicos"),
-            motivo='• Publicação da Subchefia para Assuntos Jurídicos que contém "temas jurídicos relevantes para a administração pública" no conteúdo',
-        )
+        ]

@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     enviar_sumula_para_o_teams(
         sumula,
         dia=date.today(),
-        api_endpoint=Endpoints.AREA_DE_TESTE,
+        api_endpoint=Endpoints.OFICIAL,
     )
 
     return {

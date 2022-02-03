@@ -75,10 +75,17 @@ class FiltragemPorEmenta(Filtro):
             Criterio(
                 self.ementa.contem(r"entidades da administração pública federal"),
                 motivo='"entidades da administração pública federal" na ementa',
-            ),  #! #TODO Temporário
-            Criterio(  # T2022-1-19, R2022-1-27, T2022-1-31-Carlos
-                self.ementa.contem(r"Decreto nº 71.733"),
-                motivo='"Decreto 71.733" na ementa',
+            ),  # TODO Temporário
+            #! Descontinuado - Tava dando mt problema T2022-2-3-Carlos
+            # Criterio(  # T2022-1-19, R2022-1-27, T2022-1-31-Carlos
+            #     self.ementa.contem(r"Decreto nº 71.733"),
+            #     motivo='"Decreto 71.733" na ementa',
+            # ),
+            Criterio(  # T2022-2-3-Carlos,
+                self.ementa.contem(
+                    r"agentes públicos civis da Administração Pública federal"
+                ),
+                motivo='"agentes públicos civis da Administração Pública federal" na ementa',
             ),
         ]
 

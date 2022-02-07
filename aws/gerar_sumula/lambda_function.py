@@ -1,3 +1,4 @@
+from aws.gerar_sumula.erros import DataErradaNoDBError, SumulaVazia
 from src.dou import DOU
 from src.models.publicacao import Publicacao
 from src.utils import DateRange, str_to_date, today_brazil_tz
@@ -13,10 +14,7 @@ def lambda_handler(event, context):
     data_final = str_to_date(ultimos_dois_dous[0])
 
     if data_final != today_brazil_tz():
-        return {
-            "body": f"Tentou fazer a súmula do dia {data_final}, mas era para ser a do dia {today_brazil_tz()}",
-            "status": "ERRO",
-        }
+        raise DataErradaNoDBError(data_final)
 
     dou = DOU(
         date_range=DateRange(data_inicial, data_final),
@@ -26,10 +24,7 @@ def lambda_handler(event, context):
     sumula = dou.gerar_sumula()
 
     if sumula.empty:
-        return {
-            "body": f"Não encontrou publicações nos DOUs do dia {data_inicial} (pub extra) e {data_final}",
-            "status": "VAZIO",
-        }
+        raise SumulaVazia(data_inicial, data_final)
 
     # | Organiza as publicações de modo a se assemelhar à súmula oficial
     # Tira as publicações que não são extras da súmula passada

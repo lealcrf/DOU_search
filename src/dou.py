@@ -80,8 +80,8 @@ class DOU:
 
             all_conditions.append(criterio.condicao)
 
-        pubs_para_sumula: BooleanArray = functools.reduce(ior, all_conditions)
-
+        pubs_para_sumula: BooleanArray = functools.reduce(ior, all_conditions)     
+   
         sumula = self.df[pubs_para_sumula]
 
         # # | #TODO  Passa o filtro de exclusao 

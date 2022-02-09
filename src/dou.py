@@ -60,7 +60,7 @@ class DOU:
         return FiltragemPorTitulo(self.df)
     
     def filtrar(self, condicoes):
-        return self.df[condicoes]
+        return self.df[condicoes].sort_values("data", ascending=False)
 
     def gerar_sumula(self, ingov_urls=False):
 

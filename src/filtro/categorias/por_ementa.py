@@ -56,9 +56,16 @@ class FiltragemPorEmenta(Filtro):
             ),
             Criterio(  # R2A8
                 self.ementa.contem(
-                    r"(?:Sistema de Pessoal Civil da Administração (?:Pública)? Federal|SIPEC)"
-                ),
-                motivo="Publicação da SIPEC #TODO Terminar de fazer as restrições do R2A8",
+                    r"Sistema de Pessoal Civil da Administração (?:Pública)? Federal|SIPEC"
+                )
+                & self.ementa.nao_contem(r"revogação de atos normativos")
+                & self.ementa.nao_contem(
+                    r"dos servidores públicos dos Estados, do Distrito Federal e dos Municípios"
+                )  # Só importa servidores públicos federais
+                & self.ementa.nao_contem(
+                    r"no âmbito (?!do Banco Central)"
+                ),  # Apenas aceitar se for no âmbito do Banco Central
+                motivo="Publicação da SIPEC que pode afetar os servidores do Banco Central",
             ),
             Criterio(  # R2A11
                 self.ementa.contem(r"Lei nº 8.429"),
@@ -92,18 +99,18 @@ class FiltragemPorEmenta(Filtro):
     def especificos(self):
         yield from [
             Criterio(  # R3A2
-                self.ementa.contem(r"poder executivo federal")
+                self.ementa.contem(r"(:?Poder|Poderes).{0,130}Executivo")
                 & self.secao.contem(r"DO1")
                 & self.escopo.contem(r"Atos do Poder Executivo")
                 & self.titulo.nao_contem(r"SETO\s?/\s?ME"),
-                motivo='Ato do Poder Executivo da seção 1 que contém "poder executivo federal" na ementa e não é SETO/ME',
+                motivo="Ato do Poder Executivo da seção 1 que menciona o Poder Executivo na ementa e não é SETO/ME",
             ),
             Criterio(  # R3A3
-                self.ementa.contem(r"poder executivo federal")
+                self.ementa.contem(r"(:?Poder|Poderes).{0,130}Executivo")
                 & self.secao.contem(r"DO1")
                 & self.escopo.contem(r"Ministério da Economia")
                 & self.titulo.nao_contem(r"SETO\s?/\s?ME"),
-                motivo='Publicação do Ministério da Economia da seção 1 que contém "poder executivo federal" na ementa e não é SETO/ME',
+                motivo="Publicação do Ministério da Economia da seção 1 que menciona o Poder Executivo na ementa e não é SETO/ME",
             ),
             Criterio(  # A4
                 self.ementa.contem(

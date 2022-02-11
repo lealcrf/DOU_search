@@ -8,7 +8,7 @@ import pytz
 
 
 def tirar_acentuacao(string: str):
-    if string is not None:
+    if type(string) is str:
         return "".join(
             c
             for c in unicodedata.normalize("NFD", string)

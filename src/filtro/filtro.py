@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import re
-from typing import List
+from ..utils import tirar_acentuacao
 import pandas as pd
 from pandas.core.arrays.boolean import BooleanArray
 from pandas.core.frame import DataFrame
@@ -52,6 +52,8 @@ class ContemPandasExtension:
         self.coluna = coluna
 
     def __call__(self, regex):
+        if self.coluna.name == "assinatura":
+            regex = tirar_acentuacao(regex)
         return self.coluna.str.contains(regex, na=False, flags=re.IGNORECASE)
 
 
@@ -61,7 +63,11 @@ class NaoContemPandasExtension:
         self.coluna = coluna
 
     def __call__(self, regex: str):
+        if self.coluna.name == "assinatura":
+            regex = tirar_acentuacao(regex)
+
         return ~self.coluna.str.contains(regex, na=False, flags=re.IGNORECASE)
+
 
 @pd.api.extensions.register_series_accessor("igual")
 class NaoContemPandasExtension:
@@ -69,4 +75,6 @@ class NaoContemPandasExtension:
         self.coluna = coluna
 
     def __call__(self, string):
-        return (self.coluna == string)
+        if self.coluna.name == "assinatura":
+            regex = tirar_acentuacao(regex)
+        return self.coluna == string

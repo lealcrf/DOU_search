@@ -79,6 +79,5 @@ class Publicacao:
             "url": self.pdf,
             "ementa": self.ementa,
             "escopo": self.escopo,
-            # O • só é pra deixar mais fácil minha vida no jupyter, na súmula fica feio
-            "motivos": self.motivo.replace("• ", "").replace('"', r"\"").splitlines(),
+            "motivos": self.motivo.replace('"', r"\"").splitlines(),
         }

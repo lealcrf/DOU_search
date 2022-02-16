@@ -35,8 +35,4 @@ class FiltragemPorEscopo(Filtro):
                 & self.ementa.contem("Banco Central"),
                 motivo="Publicação da PREVIC que menciona o Banco Central na Ementa",
             ),
-            Criterio(  # R1
-                self.titulo.contem(r"COAF") & self.ementa.contem("Banco Central"),
-                motivo="Publicação do COAF que menciona o Banco Central na Ementa",
-            ),
         ]

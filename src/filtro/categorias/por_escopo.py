@@ -5,7 +5,9 @@ class FiltragemPorEscopo(Filtro):
     def especificos(self):
         yield from [
             Criterio(  # M1
-                self.tipo_normativo.igual("Portaria") & self.secao.contem("DO1"),
+                self.escopo.contem("Conselho de Controle de Atividades Financeiras")
+                & self.tipo_normativo.igual("Portaria")
+                & self.secao.contem("DO1"),
                 motivo="Portaria do COAF na seção 1",
             )
         ]
@@ -24,12 +26,12 @@ class FiltragemPorEscopo(Filtro):
                 motivo="'Secretaria Especial do Tesouro e Orçamento' no escopo e menciona o Banco Central no conteúdo",
             ),
             Criterio(  # R1
-                self.titulo.contem(r"Superintendência de Seguros Privados")
+                self.escopo.contem(r"Superintendência de Seguros Privados")
                 & self.ementa.contem("Banco Central"),
                 motivo="Publicação da SUSEP que menciona o Banco Central na Ementa",
             ),
             Criterio(  # R1
-                self.titulo.contem(
+                self.escopo.contem(
                     r"Superintendência Nacional de Previdência Complementar"
                 )
                 & self.ementa.contem("Banco Central"),

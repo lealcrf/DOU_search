@@ -23,10 +23,6 @@ class FiltragemPorEmenta(Filtro):
                 motivo='"Educação financeira" na ementa',
             ),
             Criterio(  # A[123]
-                self.ementa.contem(r"Comitê Nacional de Educação Financeira"),
-                motivo='"Comitê Nacional de Educação Financeira" na ementa',
-            ),
-            Criterio(  # A[123]
                 self.ementa.contem(r"Imposto sobre Operações Financeiras"),
                 motivo='"Imposto sobre Operações Financeiras" na ementa',
             ),
@@ -52,7 +48,7 @@ class FiltragemPorEmenta(Filtro):
                 self.ementa.contem(
                     r"Subdelega competências para a prática de atos de gestão de pessoas no âmbito do Ministério da Economia às autoridades que menciona"
                 ),
-                motivo="#TODO ver o motivo do critério R2A7",
+                motivo="'Subdelega competências para a prática de atos de gestão de pessoas no âmbito do Ministério da Economia às autoridades que menciona' na ementa",
             ),
             Criterio(  # R2A8
                 self.ementa.contem(
@@ -140,5 +136,10 @@ class FiltragemPorEmenta(Filtro):
                 )
                 & self.conteudo.contem(r"Banco Central"),
                 motivo='"Grupo de Ação Financeira contra a Lavagem de Dinheiro e o Financiamento do Terrorismo" na ementa e menciona o Banco Central',
+            ),
+            Criterio( #A[123]
+                self.ementa.contem("Proteção de Dados Pessoais")
+                & self.conteudo.contem("Banco Central"),
+                motivo="'Proteção de Dados Pessoais' na ementa e menciona o Banco Central",
             ),
         ]

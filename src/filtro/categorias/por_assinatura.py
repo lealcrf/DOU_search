@@ -2,21 +2,10 @@ from ..filtro import Filtro, Criterio
 
 
 class FiltragemPorAssinatura(Filtro):
-    def especificos(self):
-        yield from [
-            Criterio(  # A28
-                self.assinatura.contem("RICARDO LIÁO")
-                & (self.tipo_normativo == "Portaria")
-                & self.secao.contem("DO1")  # R2A1
-                & self.titulo.nao_contem("DECISÃO"),  # R2A5
-                motivo="Portaria assinada pelo pelo presidente do COAF",
-            )
-        ]
-
     def presidente_e_diretores_do_BC(self):
         yield from [
             Criterio(
-                self.assinatura.contem(r"ROBERTO DE OLIVEIRA CAMPOS NETO"),
+                self.assinatura.contem(r"Roberto de Oliveira Campos Neto"),
                 motivo="Assinatura do Presidente do BC",
             ),
             Criterio(
@@ -32,23 +21,23 @@ class FiltragemPorAssinatura(Filtro):
                 motivo="Assinatura de um diretor do BC",
             ),
             Criterio(
-                self.assinatura.contem("Bruno Serra Fernandes"),
+                self.assinatura.contem(r"Bruno Serra Fernandes"),
                 motivo="Assinatura de um diretor do BC",
             ),
             Criterio(
-                self.assinatura.contem("Fernanda Magalhaes Rumenos Guardado"),
+                self.assinatura.contem(r"Fernanda Magalhaes Rumenos Guardado"),
                 motivo="Assinatura de um diretor do BC",
             ),
             Criterio(
-                self.assinatura.contem("João Manoel Pinho de Mello"),
+                self.assinatura.contem(r"João Manoel Pinho de Mello"),
                 motivo="Assinatura de um diretor do BC",
             ),
             Criterio(
-                self.assinatura.contem("Otávio Ribeiro Damaso"),
+                self.assinatura.contem(r"Otávio Ribeiro Damaso"),
                 motivo="Assinatura de um diretor do BC",
             ),
             Criterio(
-                self.assinatura.contem("Carolina de Assis Barros"),
+                self.assinatura.contem(r"Carolina de Assis Barros"),
                 motivo="Assinatura de um diretor do BC",
             ),
         ]

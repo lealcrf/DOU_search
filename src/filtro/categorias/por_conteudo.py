@@ -36,7 +36,7 @@ class FiltragemPorConteudo(Filtro):
                 self.conteudo.contem(r"cargo de Ministro de Estado da Economia"),
                 motivo="Nomeação/Exoneração do Ministro de Estado da Economia",
             ),
-            Criterio(
+            Criterio( #M3
                 self.conteudo.contem(
                     r"cargo de Ministro de Estado do Trabalho e Previdência"
                 ),

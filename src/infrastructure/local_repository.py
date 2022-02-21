@@ -27,7 +27,7 @@ def pegar_urls_do_ingov(ids: pd.Series):
         driver.get(search)
 
         # Pega o link do primeiro resultado
-        element = WebDriverWait(driver, 10).until(
+        element = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.XPATH, "//h5[@class='title-marker']/a"))
         )
         url = element.get_property("href")
@@ -36,6 +36,7 @@ def pegar_urls_do_ingov(ids: pd.Series):
 
     driver.quit()
     return urls
+
 
 
 def pegar_publicacoes_dou_db_local(

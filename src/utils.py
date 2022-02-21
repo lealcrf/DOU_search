@@ -1,8 +1,5 @@
 import unicodedata
 from datetime import date, datetime, timedelta
-import sys
-from dotenv import load_dotenv
-from pathlib import Path
 
 import pytz
 

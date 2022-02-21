@@ -76,5 +76,5 @@ class NaoContemPandasExtension:
 
     def __call__(self, string):
         if self.coluna.name == "assinatura":
-            regex = tirar_acentuacao(regex)
+            string = tirar_acentuacao(string)
         return self.coluna == string

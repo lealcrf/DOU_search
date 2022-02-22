@@ -105,8 +105,11 @@ class FiltragemPorEmenta(Filtro):
                 self.ementa.contem(r"(:?Poder|Poderes).{0,130}Executivo")
                 & self.secao.contem(r"DO1")
                 & self.escopo.contem(r"Ministério da Economia")
-                & self.titulo.nao_contem(r"SETO\s?/\s?ME"),
-                motivo="Publicação do Ministério da Economia da seção 1 que menciona o Poder Executivo na ementa e não é SETO/ME",
+                & self.titulo.nao_contem(r"SETO\s?/\s?ME")
+                & self.ementa.nao_contem(
+                    r"no âmbito do (?!Poder Executivo)"
+                ),  # Log2022-02-21
+                motivo="Publicação do Ministério da Economia na seção 1 direcionada ao Poder Executivo que não é SETO/ME",
             ),
             Criterio(  # A4
                 self.ementa.contem(
@@ -137,7 +140,7 @@ class FiltragemPorEmenta(Filtro):
                 & self.conteudo.contem(r"Banco Central"),
                 motivo='"Grupo de Ação Financeira contra a Lavagem de Dinheiro e o Financiamento do Terrorismo" na ementa e menciona o Banco Central',
             ),
-            Criterio( #A[123]
+            Criterio(  # A[123]
                 self.ementa.contem("Proteção de Dados Pessoais")
                 & self.conteudo.contem("Banco Central"),
                 motivo="'Proteção de Dados Pessoais' na ementa e menciona o Banco Central",

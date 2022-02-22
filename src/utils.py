@@ -8,7 +8,7 @@ def tirar_acentuacao(string: str):
     if type(string) is str:
         return "".join(
             c
-            for c in unicodedata.normalize("NFD", string)
+            for c in unicodedata.normalize("NFD", string.strip())
             if unicodedata.category(c) != "Mn"
         )
 

@@ -8,14 +8,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import os
 
 
 def pegar_urls_do_ingov(ids: pd.Series):
     """Faz um scrape para achar o link do site in.gov baseado no id da matéria"""
 
     options = Options()
-    options.add_argument("--no-sandbox")  # exec with Lambda default user (root)
+    options.add_argument("--no-sandbox")
     options.add_argument("--headless")
 
     driver = webdriver.Chrome(options=options)
@@ -38,10 +37,7 @@ def pegar_urls_do_ingov(ids: pd.Series):
     return urls
 
 
-
-def pegar_publicacoes_dou_db_local(
-    date_range: DateRange = None
-) -> pd.DataFrame:
+def pegar_publicacoes_dou_db_local(date_range: DateRange = None) -> pd.DataFrame:
     """Pega publicacoes do banco de dados onde guardamos todas as DOU's"""
 
     conn = mysql.connector.connect(

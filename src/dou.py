@@ -16,8 +16,9 @@ from dotenv import load_dotenv
 from datetime import date
 import os
 
-load_dotenv()
 
+# Isso tira problemas de importação que surgem quando o script é rodado na Cloud 
+load_dotenv()
 is_running_locally = os.getenv("IS_RUNNING_LOCALLY")
 if is_running_locally:
     import src.infrastructure.local_repository as local_repo
@@ -38,7 +39,7 @@ class DOU:
             self.df = local_repo.pegar_publicacoes_dou_db_local(date_range)
 
         if not self.df.empty:
-            self.df.assinatura = self.df.assinatura.apply(tirar_acentuacao) #TODO Aplicar strip() para todas as assinaturas
+            self.df.assinatura = self.df.assinatura.apply(tirar_acentuacao)
 
     @property
     def filtrar_por_assinatura(self):

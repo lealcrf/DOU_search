@@ -123,7 +123,7 @@ class FiltragemPorEmenta(Filtro):
 
     def menciona_o_banco_central(self):
         yield from [
-            Criterio(  # TODO Implementa o filtro por exclusao e tira meu workaroung
+            Criterio(  # TODO Implementa o filtro por exclusao e tira meu workaround
                 self.ementa.contem(r"Banco Central")
                 & self.tipo_normativo.nao_contem(r"Instrução Normativa"),
                 motivo="Menciona o Banco Central na ementa",
